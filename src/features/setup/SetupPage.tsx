@@ -261,7 +261,7 @@ export function SetupPage() {
       </div>
 
       {/* Phones: the action stays within thumb reach. */}
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-glass px-5 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md lg:hidden">
+      <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 border-t border-line bg-glass px-5 py-3 backdrop-blur-md lg:hidden">
         <div className="flex items-center gap-4">
           <p className="min-w-0 flex-1 truncate text-sm font-semibold text-ink">
             {destination ? destination.name : t('setup.needDestination')}

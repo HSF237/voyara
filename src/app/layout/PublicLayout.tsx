@@ -1,12 +1,18 @@
 import { motion } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, Outlet, ScrollRestoration, useLocation } from 'react-router-dom';
 import { paths } from '@/app/paths';
-import { Header } from './Header';
+import { buttonStyles } from '@/components/ui';
+import { useAuth } from '@/store/auth';
+import { LanguageSelect, ThemeToggle } from './controls';
+import { LogoMark } from './Logo';
 
-export function AppShell() {
+/** The public front door: landing page and other pages anyone can open. */
+export function PublicLayout() {
   const { t } = useTranslation();
   const { pathname } = useLocation();
+  const signedIn = useAuth((state) => Boolean(state.user));
 
   return (
     <div className="flex min-h-dvh flex-col bg-bg text-ink">
@@ -16,7 +22,32 @@ export function AppShell() {
       >
         {t('nav.skip')}
       </a>
-      <Header />
+      <header className="sticky top-0 z-40 border-b border-line/70 bg-bg/85 backdrop-blur-md">
+        <div className="container-page flex h-16 items-center gap-2">
+          <Link
+            to={paths.home}
+            className="me-auto flex items-center gap-2.5 rounded-md"
+            aria-label={`${t('app.name')} — ${t('nav.home')}`}
+          >
+            <LogoMark />
+            <span
+              className="font-display text-xl font-medium tracking-tight text-ink"
+              translate="no"
+            >
+              {t('app.name')}
+            </span>
+          </Link>
+          <LanguageSelect className="hidden sm:block" />
+          <ThemeToggle />
+          <Link
+            to={signedIn ? paths.dashboard : paths.login}
+            className={buttonStyles({ size: 'sm' })}
+          >
+            {signedIn ? t('nav.openApp') : t('nav.signIn')}
+            <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" />
+          </Link>
+        </div>
+      </header>
       <main id="main" tabIndex={-1} className="flex-1 outline-none">
         <motion.div
           key={pathname}

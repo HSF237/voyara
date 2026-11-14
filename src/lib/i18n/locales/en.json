@@ -9,7 +9,12 @@
     "design": "Design system",
     "skip": "Skip to content",
     "main": "Main menu",
-    "plan": "Plan a trip"
+    "plan": "Plan a trip",
+    "trips": "My trips",
+    "signIn": "Sign in",
+    "openApp": "Open app",
+    "signOut": "Sign out",
+    "account": "Account"
   },
   "header": {
     "toLight": "Switch to light theme",
@@ -51,7 +56,8 @@
     "final": {
       "title": "Where to first?",
       "body": "Pick a place. The rest takes about a minute."
-    }
+    },
+    "popularTitle": "Popular destinations"
   },
   "settings": {
     "title": "Settings",
@@ -77,7 +83,9 @@
     },
     "saved": "Saved",
     "reset": "Reset to defaults",
-    "resetDone": "Settings reset"
+    "resetDone": "Settings reset",
+    "signedInAs": "Signed in with Google",
+    "guestAccount": "Using Voyara as a guest"
   },
   "common": {
     "close": "Close",
@@ -200,5 +208,68 @@
     "rate": "Exchange rate",
     "forecastTitle": "Forecast for your dates",
     "rainChance": "Rain chance"
+  },
+  "auth": {
+    "title": "Welcome to Voyara",
+    "subtitle": "Sign in to keep your trips in one place.",
+    "google": "Continue with Google",
+    "or": "or",
+    "guestTitle": "Continue as a guest",
+    "guestName": "Your name",
+    "guestNamePlaceholder": "e.g. Hasan",
+    "pickAvatar": "Pick an avatar",
+    "guestGo": "Start planning",
+    "guestNote": "Guest trips stay on this device.",
+    "guestLabel": "Guest",
+    "signedOut": "Signed out",
+    "errors": {
+      "notConfigured": "Google sign-in isn't set up on this copy of the app.",
+      "popupClosed": "Sign-in was cancelled.",
+      "popupBlocked": "Your browser blocked the sign-in window. Allow pop-ups and try again.",
+      "notEnabled": "Google sign-in isn't switched on for this app yet. You can continue as a guest.",
+      "domain": "This web address isn't approved for sign-in yet.",
+      "network": "Couldn't reach the sign-in service. Check your connection.",
+      "unknown": "Sign-in didn't work. Please try again."
+    },
+    "points": {
+      "one": "Plans that adapt to weather and opening hours",
+      "two": "Real places only, never invented",
+      "three": "Works in six languages"
+    }
+  },
+  "dash": {
+    "morning": "Good morning, {{name}}",
+    "afternoon": "Good afternoon, {{name}}",
+    "evening": "Good evening, {{name}}",
+    "night": "Up late, {{name}}?",
+    "nextTrip": "Next trip",
+    "now": "Happening now",
+    "daysToGo": "days to go",
+    "openTrip": "Open trip",
+    "emptyTitle": "No trips yet",
+    "emptyBody": "Search a destination to start your first plan.",
+    "stats": {
+      "trips": "Trips",
+      "countries": "Countries",
+      "nights": "Nights planned"
+    },
+    "yourTrips": "Your trips",
+    "seeAll": "See all",
+    "ideas": "Ideas for your next trip",
+    "planHere": "Plan a trip here",
+    "whereNext": "Where next?"
+  },
+  "trips": {
+    "title": "My trips",
+    "upcoming": "Upcoming",
+    "past": "Past",
+    "emptyUpcoming": "Nothing upcoming. Time to plan one.",
+    "emptyPast": "Past trips will collect here."
+  },
+  "bar": {
+    "done": "Done"
+  },
+  "photo": {
+    "by": "Photo: {{credit}}"
   }
 }

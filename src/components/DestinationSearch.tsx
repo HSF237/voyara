@@ -13,6 +13,8 @@ type DestinationSearchProps = {
   size?: 'md' | 'lg';
   /** Visible label. Without it the input is labelled for screen readers only. */
   label?: string;
+  /** No border or background: for use inside another control, such as the trip bar. */
+  bare?: boolean;
   className?: string;
 };
 
@@ -21,7 +23,10 @@ type DestinationSearchProps = {
  * Enter, or tap a result. Every suggestion comes from the geocoding service.
  */
 export const DestinationSearch = forwardRef<HTMLInputElement, DestinationSearchProps>(
-  function DestinationSearch({ value, onSelect, size = 'md', label, className }, ref) {
+  function DestinationSearch(
+    { value, onSelect, size = 'md', label, bare = false, className },
+    ref,
+  ) {
     const { t } = useTranslation();
     const inputId = useId();
     const listId = useId();
@@ -129,11 +134,14 @@ export const DestinationSearch = forwardRef<HTMLInputElement, DestinationSearchP
             }}
             onKeyDown={handleKeyDown}
             className={cn(
-              'w-full border border-line-strong bg-surface text-ink shadow-sm transition-shadow placeholder:text-muted',
-              'focus:shadow-md',
-              large
-                ? 'h-16 rounded-full ps-13 pe-14 text-lg'
-                : 'h-12 rounded-md ps-10 pe-11 text-base',
+              'w-full text-ink placeholder:text-muted',
+              bare
+                ? 'h-14 rounded-md bg-transparent ps-10 pe-11 text-base font-semibold placeholder:font-normal'
+                : 'border border-line-strong bg-surface shadow-sm transition-shadow focus:shadow-md',
+              !bare &&
+                (large
+                  ? 'h-16 rounded-full ps-13 pe-14 text-lg'
+                  : 'h-12 rounded-md ps-10 pe-11 text-base'),
             )}
           />
           <span className={cn('absolute top-1/2 -translate-y-1/2', large ? 'end-4' : 'end-2')}>

@@ -6,8 +6,8 @@ friends change their minds.
 A travel-planner PWA built for the 6th International Digital Fest 2027 (Asia Pacific University,
 Kuala Lumpur).
 
-> **Status: Milestones 1–3 of 12** — design system, the 3D-globe landing page, and trip setup with
-> live destination search, exchange rates and forecast. See [Milestones](#milestones).
+> **Status: Milestones 1–3 of 12, plus the app shell** — sign-in, dashboard and My trips around
+> the 3D-globe landing page and live trip setup. See [Milestones](#milestones).
 
 ## Run it
 
@@ -33,13 +33,31 @@ Copy `.env.example` to `.env.local`. Nothing is required yet: destination search
 
 ## What works today
 
-| Page            | What it does                                                                          |
-| --------------- | ------------------------------------------------------------------------------------- |
-| `/`             | 3D globe with flight arcs; search a destination and the globe flies to it and pins it |
-| `/plan/new`     | Trip setup on one screen: destination, dates, travellers, budget, pace, interests     |
-| `/plan/:tripId` | A saved trip: its trip pass, local time, exchange rate and forecast                   |
-| `/settings`     | Language, theme, home currency and units — saved on the device                        |
-| `/design`       | Every colour, type size and component, for checking light / dark / RTL                |
+Voyara is an app with a public front door:
+
+| Page            | Who       | What it does                                                         |
+| --------------- | --------- | -------------------------------------------------------------------- |
+| `/`             | Anyone    | Landing: 3D globe, trip bar (where / when / who), destination photos |
+| `/login`        | Anyone    | Continue with Google, or as a guest with a name and avatar           |
+| `/home`         | Signed in | Dashboard: trip bar, next-trip countdown, stats, your trips, ideas   |
+| `/trips`        | Signed in | Every saved trip, upcoming and past                                  |
+| `/plan/new`     | Signed in | Trip setup on one screen                                             |
+| `/plan/:tripId` | Signed in | A saved trip: its pass, local time, exchange rate and forecast       |
+| `/settings`     | Signed in | Account, language, theme, home currency and units                    |
+| `/design`       | Anyone    | Every colour, type size and component                                |
+
+Signed-in pages share an app shell: a sidebar on wide screens, a top bar and bottom tab bar on
+phones (`src/app/layout/AppLayout.tsx`). Opening one without a profile sends you to sign-in and
+back again afterwards.
+
+### Sign-in
+
+- **Guest** works out of the box and stays on the device.
+- **Google** needs Firebase Authentication switched on once: Firebase console → Authentication →
+  Get started → Sign-in method → enable **Google**. Later, add your Vercel domain under
+  Authentication → Settings → Authorised domains.
+- The Firebase SDK is only downloaded when someone taps "Continue with Google".
+- Trips are saved on the device for now; syncing them to the account arrives with group mode.
 
 Trip setup is built from custom widgets: a destination autocomplete, a date-range calendar with
 a day-and-night strip, a traveller stepper with a line-up of figures, a budget slider with live

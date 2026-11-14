@@ -1,10 +1,14 @@
 import { ArrowRight } from 'lucide-react';
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { paths } from '@/app/paths';
 import { usePageTitle } from '@/app/usePageTitle';
+import { DestinationRail } from '@/features/destinations/DestinationRail';
 import { onIdle } from '@/lib/onIdle';
+import { useNow } from '@/lib/useNow';
+import { useTripDraft } from '@/store/tripDraft';
+import { CITIES } from './cities';
 import { Hero } from './Hero';
 
 const StorySection = lazy(() => import('./StorySection'));
@@ -12,6 +16,9 @@ const StorySection = lazy(() => import('./StorySection'));
 export function LandingPage() {
   const { t } = useTranslation();
   usePageTitle();
+  const navigate = useNavigate();
+  const now = useNow();
+  const setDestination = useTripDraft((state) => state.setDestination);
   const sentinel = useRef<HTMLDivElement>(null);
   const [showStory, setShowStory] = useState(false);
 
@@ -37,6 +44,25 @@ export function LandingPage() {
   return (
     <>
       <Hero />
+      <section
+        aria-labelledby="popular-title"
+        className="relative z-0 container-page pt-14 sm:pt-20"
+      >
+        <h2 id="popular-title" className="font-display text-2xl font-medium tracking-tight">
+          {t('home.popularTitle')}
+        </h2>
+        <div className="mt-5">
+          <DestinationRail
+            places={Object.values(CITIES)}
+            onPick={(place) => {
+              setDestination(place);
+              void navigate(paths.setup);
+            }}
+            now={now}
+            label={t('home.popularTitle')}
+          />
+        </div>
+      </section>
       <div ref={sentinel} />
       {showStory ? (
         <Suspense fallback={<div className="min-h-[40rem]" />}>

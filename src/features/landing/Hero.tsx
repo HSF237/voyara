@@ -1,19 +1,12 @@
-import {
-  AnimatePresence,
-  motion,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-  type Variants,
-} from 'framer-motion';
-import { ArrowRight, Hand } from 'lucide-react';
+import { motion, useReducedMotion, useScroll, useTransform, type Variants } from 'framer-motion';
+import { Hand } from 'lucide-react';
 import { Fragment, lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { paths } from '@/app/paths';
 import { useResolvedTheme } from '@/app/useResolvedTheme';
-import { DestinationSearch } from '@/components/DestinationSearch';
-import { Badge, Button } from '@/components/ui';
+import { TripBar } from '@/components/TripBar';
+import { Badge } from '@/components/ui';
 import { cn } from '@/lib/cn';
 import { onIdle } from '@/lib/onIdle';
 import { flagEmoji, type Place } from '@/services/geocoding';
@@ -120,39 +113,7 @@ export function Hero() {
           </motion.p>
 
           <motion.div variants={fadeUp} className="mt-8 max-w-xl">
-            <DestinationSearch value={selected} onSelect={setDestination} size="lg" />
-
-            <AnimatePresence initial={false} mode="popLayout">
-              {selected && (
-                <motion.div
-                  key={selected.id}
-                  layout
-                  initial={{ opacity: 0, y: -8, scale: 0.97 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.97 }}
-                  transition={{ type: 'spring', stiffness: 420, damping: 30 }}
-                  className="mt-3 flex items-center gap-3 rounded-lg border border-line bg-surface p-2.5 ps-4 shadow-sm"
-                >
-                  <span className="text-2xl leading-none" aria-hidden="true">
-                    {flagEmoji(selected.countryCode)}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-semibold text-ink">
-                      {selected.name}
-                    </span>
-                    <span className="block truncate text-xs text-muted">
-                      {[selected.region, selected.country].filter(Boolean).join(', ')}
-                    </span>
-                  </span>
-                  <Button
-                    onClick={() => void navigate(paths.setup)}
-                    iconEnd={<ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" />}
-                  >
-                    {t('home.planThis')}
-                  </Button>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <TripBar stacked onSubmit={() => void navigate(paths.setup)} />
 
             <motion.div layout className="mt-4 flex flex-wrap items-center gap-2">
               <span className="me-1 text-sm text-muted">{t('home.popular')}</span>

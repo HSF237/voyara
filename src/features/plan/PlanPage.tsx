@@ -219,7 +219,7 @@ function TripView({ trip }: { trip: Trip }) {
               variant="danger"
               onClick={() => {
                 // Leave first, so this page never renders without its trip.
-                void navigate(paths.home);
+                void navigate(paths.dashboard);
                 removeTrip(trip.id);
                 toast({ title: t('trip.deleted') });
               }}

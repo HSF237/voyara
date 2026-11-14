@@ -1,7 +1,9 @@
-import { Check, Monitor, Moon, Sun } from 'lucide-react';
+import { Check, LogOut, Monitor, Moon, Sun } from 'lucide-react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/app/usePageTitle';
+import { useSession } from '@/app/useSession';
+import { UserAvatar } from '@/components/UserAvatar';
 import { Button, Card, Segmented, Select, toast, type SegmentedOption } from '@/components/ui';
 import { cn } from '@/lib/cn';
 import { LANGUAGES } from '@/lib/i18n/languages';
@@ -11,6 +13,7 @@ import { useSettings, type ThemePreference } from '@/store/settings';
 export function SettingsPage() {
   const { t } = useTranslation();
   usePageTitle(t('settings.title'));
+  const { user, signOut } = useSession();
 
   const { theme, language, currency, units, setTheme, setLanguage, setCurrency, setUnits, reset } =
     useSettings();
@@ -43,6 +46,26 @@ export function SettingsPage() {
       <p className="mt-2 text-muted">{t('settings.subtitle')}</p>
 
       <div className="mt-8 space-y-4">
+        {user && (
+          <Card className="flex flex-wrap items-center gap-4">
+            <UserAvatar user={user} size="lg" />
+            <div className="min-w-0 flex-1">
+              <p className="truncate font-display text-lg font-medium text-ink">{user.name}</p>
+              <p className="truncate text-sm text-muted">
+                {user.provider === 'google'
+                  ? (user.email ?? t('settings.signedInAs'))
+                  : t('settings.guestAccount')}
+              </p>
+            </div>
+            <Button
+              variant="secondary"
+              onClick={signOut}
+              iconStart={<LogOut className="size-4 rtl:rotate-180" aria-hidden="true" />}
+            >
+              {t('nav.signOut')}
+            </Button>
+          </Card>
+        )}
         <Card>
           <fieldset>
             <legend className="text-sm font-medium text-ink">{t('settings.language.label')}</legend>

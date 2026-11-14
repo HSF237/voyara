@@ -9,7 +9,12 @@
     "design": "Sistem reka bentuk",
     "skip": "Langkau ke kandungan",
     "main": "Menu utama",
-    "plan": "Rancang perjalanan"
+    "plan": "Rancang perjalanan",
+    "trips": "Perjalanan saya",
+    "signIn": "Log masuk",
+    "openApp": "Buka aplikasi",
+    "signOut": "Log keluar",
+    "account": "Akaun"
   },
   "header": {
     "toLight": "Tukar ke tema cerah",
@@ -51,7 +56,8 @@
     "final": {
       "title": "Ke mana dahulu?",
       "body": "Pilih satu tempat. Selebihnya ambil masa kira-kira seminit."
-    }
+    },
+    "popularTitle": "Destinasi popular"
   },
   "settings": {
     "title": "Tetapan",
@@ -77,7 +83,9 @@
     },
     "saved": "Disimpan",
     "reset": "Tetapkan semula kepada lalai",
-    "resetDone": "Tetapan ditetapkan semula"
+    "resetDone": "Tetapan ditetapkan semula",
+    "signedInAs": "Log masuk dengan Google",
+    "guestAccount": "Menggunakan Voyara sebagai tetamu"
   },
   "common": {
     "close": "Tutup",
@@ -200,5 +208,68 @@
     "rate": "Kadar pertukaran",
     "forecastTitle": "Ramalan untuk tarikh anda",
     "rainChance": "Kemungkinan hujan"
+  },
+  "auth": {
+    "title": "Selamat datang ke Voyara",
+    "subtitle": "Log masuk untuk menyimpan semua perjalanan anda di satu tempat.",
+    "google": "Teruskan dengan Google",
+    "or": "atau",
+    "guestTitle": "Teruskan sebagai tetamu",
+    "guestName": "Nama anda",
+    "guestNamePlaceholder": "cth. Hasan",
+    "pickAvatar": "Pilih avatar",
+    "guestGo": "Mula merancang",
+    "guestNote": "Perjalanan tetamu kekal pada peranti ini.",
+    "guestLabel": "Tetamu",
+    "signedOut": "Telah log keluar",
+    "errors": {
+      "notConfigured": "Log masuk Google belum disediakan pada salinan aplikasi ini.",
+      "popupClosed": "Log masuk dibatalkan.",
+      "popupBlocked": "Pelayar anda menyekat tetingkap log masuk. Benarkan pop timbul dan cuba lagi.",
+      "notEnabled": "Log masuk Google belum dihidupkan untuk aplikasi ini. Anda boleh teruskan sebagai tetamu.",
+      "domain": "Alamat web ini belum diluluskan untuk log masuk.",
+      "network": "Tidak dapat menghubungi perkhidmatan log masuk. Semak sambungan anda.",
+      "unknown": "Log masuk tidak berjaya. Sila cuba lagi."
+    },
+    "points": {
+      "one": "Pelan yang menyesuaikan diri dengan cuaca dan waktu operasi",
+      "two": "Tempat sebenar sahaja, tidak pernah direka",
+      "three": "Berfungsi dalam enam bahasa"
+    }
+  },
+  "dash": {
+    "morning": "Selamat pagi, {{name}}",
+    "afternoon": "Selamat tengah hari, {{name}}",
+    "evening": "Selamat petang, {{name}}",
+    "night": "Masih berjaga, {{name}}?",
+    "nextTrip": "Perjalanan seterusnya",
+    "now": "Sedang berlangsung",
+    "daysToGo": "hari lagi",
+    "openTrip": "Buka perjalanan",
+    "emptyTitle": "Belum ada perjalanan",
+    "emptyBody": "Cari destinasi untuk memulakan pelan pertama anda.",
+    "stats": {
+      "trips": "Perjalanan",
+      "countries": "Negara",
+      "nights": "Malam dirancang"
+    },
+    "yourTrips": "Perjalanan anda",
+    "seeAll": "Lihat semua",
+    "ideas": "Idea untuk perjalanan seterusnya",
+    "planHere": "Rancang perjalanan di sini",
+    "whereNext": "Ke mana seterusnya?"
+  },
+  "trips": {
+    "title": "Perjalanan saya",
+    "upcoming": "Akan datang",
+    "past": "Lepas",
+    "emptyUpcoming": "Tiada yang akan datang. Masa untuk merancang.",
+    "emptyPast": "Perjalanan lepas akan terkumpul di sini."
+  },
+  "bar": {
+    "done": "Selesai"
+  },
+  "photo": {
+    "by": "Foto: {{credit}}"
   }
 }
