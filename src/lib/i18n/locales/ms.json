@@ -1,11 +1,15 @@
 {
-  "app": { "name": "Voyara", "tagline": "Pelan yang terus berfungsi" },
+  "app": {
+    "name": "Voyara",
+    "tagline": "Pelan yang terus berfungsi"
+  },
   "nav": {
     "home": "Laman utama",
     "settings": "Tetapan",
     "design": "Sistem reka bentuk",
     "skip": "Langkau ke kandungan",
-    "main": "Menu utama"
+    "main": "Menu utama",
+    "plan": "Rancang perjalanan"
   },
   "header": {
     "toLight": "Tukar ke tema cerah",
@@ -17,29 +21,51 @@
     "titleLead": "Aplikasi lain buatkan anda pelan.",
     "titleEmphasis": "Voyara pastikan ia terus berfungsi.",
     "body": "Walaupun cuaca, orang ramai, atau rakan anda berubah fikiran.",
-    "stepsLabel": "Cara ia berfungsi",
-    "steps": {
-      "one": {
-        "title": "Ke mana & bila",
-        "body": "Pilih destinasi dan tarikh anda. Itu sahaja borangnya."
-      },
-      "two": {
+    "searchLabel": "Anda mahu ke mana?",
+    "searchPlaceholder": "Kuala Lumpur, Kochi, Tokyo…",
+    "popular": "Popular",
+    "planThis": "Rancang perjalanan ini",
+    "dragHint": "Seret untuk putar",
+    "storyLabel": "Cara ia berfungsi",
+    "story": {
+      "swipe": {
         "title": "Leret apa yang anda suka",
-        "body": "Tempat sebenar, satu kad pada satu masa. Kanan untuk simpan, kiri untuk langkau."
+        "body": "Tempat sebenar, satu kad pada satu masa. Kanan untuk simpan, kiri untuk langkau, atas untuk wajib pergi."
       },
-      "three": {
-        "title": "Siap",
-        "body": "Pelan hari demi hari yang menyesuaikan diri dengan cuaca, waktu operasi dan bajet."
+      "plan": {
+        "title": "Dapatkan pelan yang sesuai",
+        "body": "Hentian dikumpulkan mengikut kawasan, disusun untuk menjimatkan masa perjalanan, dan disemak dengan waktu operasi serta bajet anda."
+      },
+      "live": {
+        "title": "Ia terus berfungsi sendiri",
+        "body": "Hujan pukul tiga? Tempat tutup pada hari Isnin? Voyara mengesannya dan menawarkan pembetulan satu ketik."
       }
     },
-    "ctaDesign": "Lihat sistem reka bentuk",
-    "ctaSettings": "Buka tetapan"
+    "mock": {
+      "keep": "Simpan",
+      "skip": "Langkau",
+      "rain": "Hujan dijangka 3–5 petang",
+      "swap": "Tukar hentian",
+      "swapped": "Ditukar. Hari anda masih berjalan lancar."
+    },
+    "final": {
+      "title": "Ke mana dahulu?",
+      "body": "Pilih satu tempat. Selebihnya ambil masa kira-kira seminit."
+    }
   },
   "settings": {
     "title": "Tetapan",
     "subtitle": "Disimpan pada peranti ini.",
-    "language": { "label": "Bahasa", "hint": "Seluruh aplikasi bertukar serta-merta." },
-    "theme": { "label": "Tema", "light": "Cerah", "dark": "Gelap", "system": "Sistem" },
+    "language": {
+      "label": "Bahasa",
+      "hint": "Seluruh aplikasi bertukar serta-merta."
+    },
+    "theme": {
+      "label": "Tema",
+      "light": "Cerah",
+      "dark": "Gelap",
+      "system": "Sistem"
+    },
     "currency": {
       "label": "Mata wang asal",
       "hint": "Harga turut ditunjukkan dalam mata wang ini."
@@ -67,5 +93,112 @@
     "crashTitle": "Ada sesuatu yang tidak kena",
     "crashBody": "Aplikasi mengalami ralat yang tidak dijangka. Memuat semula biasanya menyelesaikannya.",
     "retry": "Cuba lagi"
+  },
+  "search": {
+    "searching": "Mencari…",
+    "noResults": "Tiada tempat ditemui. Semak ejaan atau cuba bandar berdekatan.",
+    "error": "Carian tidak dapat dicapai sekarang. Semak sambungan anda dan cuba lagi.",
+    "clear": "Kosongkan",
+    "found": "Tempat ditemui: {{count}}"
+  },
+  "setup": {
+    "title": "Rancang perjalanan",
+    "subtitle": "Hanya destinasi yang wajib. Yang lain bermula dengan nilai lalai yang munasabah.",
+    "where": "Ke mana",
+    "when": "Bila",
+    "who": "Siapa yang pergi",
+    "interests": "Minat",
+    "optional": "Pilihan",
+    "interestsHint": "Biarkan kosong untuk sedikit daripada semuanya.",
+    "dates": {
+      "length": "Hari:",
+      "prev": "Bulan sebelumnya",
+      "next": "Bulan seterusnya",
+      "pickStart": "Ketik tarikh mula",
+      "pickEnd": "Sekarang ketik tarikh akhir",
+      "strip": "Perjalanan anda, hari demi hari"
+    },
+    "travellers": {
+      "label": "Pengembara",
+      "add": "Tambah pengembara",
+      "remove": "Buang pengembara"
+    },
+    "crew": {
+      "solo": "Perjalanan solo",
+      "duo": "Perjalanan berdua",
+      "small": "Kumpulan kecil",
+      "big": "Kumpulan besar"
+    },
+    "budget": {
+      "title": "Bajet",
+      "total": "Jumlah untuk perjalanan",
+      "perPersonDay": "Seorang, sehari",
+      "inLocal": "Di {{country}}",
+      "rateDate": "kadar pada {{date}}",
+      "rateOffline": "Kadar semasa tidak tersedia sekarang."
+    },
+    "pace": {
+      "title": "Rentak",
+      "relaxed": "Santai",
+      "relaxedHint": "2–3 hentian sehari, rehat panjang",
+      "balanced": "Seimbang",
+      "balancedHint": "4–5 hentian sehari",
+      "packed": "Padat",
+      "packedHint": "6–7 hentian sehari, mula awal"
+    },
+    "planIt": "Rancangkan",
+    "needDestination": "Pilih destinasi dahulu"
+  },
+  "interests": {
+    "food": "Makanan",
+    "nature": "Alam semula jadi",
+    "history": "Sejarah",
+    "shopping": "Beli-belah",
+    "nightlife": "Hiburan malam",
+    "adventure": "Pengembaraan",
+    "family": "Keluarga",
+    "religious": "Tempat ibadat",
+    "photography": "Fotografi"
+  },
+  "ticket": {
+    "pass": "Pas perjalanan",
+    "destination": "Destinasi",
+    "choose": "Destinasi anda muncul di sini",
+    "dates": "Tarikh",
+    "nights": "Malam",
+    "travellers": "Pengembara",
+    "pace": "Rentak",
+    "budget": "Bajet",
+    "weather": "Ramalan cuaca",
+    "weatherLater": "Ramalan dibuka 16 hari sebelum anda bertolak.",
+    "weatherUnavailable": "Ramalan tidak tersedia sekarang.",
+    "weatherChoose": "Pilih destinasi untuk melihat ramalan."
+  },
+  "weather": {
+    "clear": "Cerah",
+    "partly": "Separa berawan",
+    "cloudy": "Mendung",
+    "fog": "Kabus",
+    "drizzle": "Renyai",
+    "rain": "Hujan",
+    "snow": "Salji",
+    "storm": "Ribut petir"
+  },
+  "trip": {
+    "saved": "Perjalanan disimpan",
+    "next": "Apa seterusnya",
+    "stepDetails": "Butiran perjalanan",
+    "stepPlaces": "Pilih tempat anda",
+    "stepPlan": "Pelan hari demi hari anda",
+    "placesSoon": "Dek leret sedang dibina seterusnya.",
+    "edit": "Edit butiran",
+    "delete": "Padam perjalanan",
+    "deleteTitle": "Padam perjalanan ini?",
+    "deleteBody": "Ia akan dibuang daripada peranti ini.",
+    "deleted": "Perjalanan dipadam",
+    "localTime": "Waktu tempatan di sana",
+    "rate": "Kadar pertukaran",
+    "forecastTitle": "Ramalan untuk tarikh anda",
+    "rainChance": "Kemungkinan hujan"
   }
 }

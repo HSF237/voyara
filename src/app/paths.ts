@@ -3,9 +3,7 @@
  * the features behind them are built.
  *
  * Planned (later milestones):
- *   /plan/new            trip setup
  *   /plan/:tripId/swipe  swipe deck
- *   /plan/:tripId        plan view (timeline + map)
  *   /plan/:tripId/today  trip-day mode
  *   /group/:roomId       group planning room
  *   /trip/:tripId        public read-only share page
@@ -14,6 +12,10 @@
  */
 export const paths = {
   home: '/',
+  setup: '/plan/new',
+  plan: '/plan/:tripId',
   settings: '/settings',
   design: '/design',
 } as const;
+
+export const planPath = (tripId: string) => `/plan/${encodeURIComponent(tripId)}`;

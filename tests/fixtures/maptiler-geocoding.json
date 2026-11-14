@@ -1,0 +1,113 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "ref": "osm:r2939672",
+        "country_code": "my",
+        "wikidata": "Q1865",
+        "kind": "admin_area",
+        "place_designation": "city"
+      },
+      "geometry": { "type": "Point", "coordinates": [101.69423684477806, 3.1516964446589704] },
+      "bbox": [101.61513883620502, 3.0333981700608144, 101.75849452614784, 3.244553836661832],
+      "center": [101.69423684477806, 3.1516964446589704],
+      "place_name": "Kuala Lumpur, Malaysia",
+      "place_type": ["region"],
+      "relevance": 1,
+      "id": "region.1677",
+      "text": "Kuala Lumpur",
+      "context": [
+        {
+          "ref": "osm:r2108121",
+          "id": "country.159",
+          "text": "Malaysia",
+          "country_code": "my",
+          "wikidata": "Q833",
+          "kind": "admin_area"
+        },
+        {
+          "ref": "osm:n36966065",
+          "id": "continental_marine.5",
+          "text": "Asia",
+          "wikidata": "Q48",
+          "feature_tags": {
+            "sqkm": "44614500",
+            "place": "continent",
+            "wikipedia": "en:Asia",
+            "population": "4950360147"
+          },
+          "categories": ["continent"]
+        }
+      ]
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ref": "osm:n1308722438",
+        "country_code": "id",
+        "wikidata": "Q14600700",
+        "kind": "place",
+        "place_designation": "village"
+      },
+      "geometry": { "type": "Point", "coordinates": [122.5909772515297, 0.6427152143110246] },
+      "bbox": [122.5909772515297, 0.6427152143110246, 122.5909772515297, 0.6427152143110246],
+      "center": [122.5909772515297, 0.6427152143110246],
+      "place_name": "Kuala Lumpur, Boalemo, Indonesia",
+      "place_type": ["place"],
+      "relevance": 1,
+      "id": "place.422557",
+      "text": "Kuala Lumpur",
+      "context": [
+        {
+          "ref": "osm:r14909130",
+          "id": "county.19397",
+          "text": "Boalemo",
+          "country_code": "id",
+          "wikidata": "Q14508",
+          "kind": "admin_area"
+        },
+        {
+          "ref": "osm:r2388665",
+          "id": "region.1209",
+          "text": "Gorontalo",
+          "country_code": "id",
+          "wikidata": "Q5067",
+          "kind": "admin_area"
+        },
+        {
+          "ref": "osm:w496603531",
+          "id": "major_landform.4169351",
+          "text": "Sungai Paguyaman",
+          "country_code": "id",
+          "feature_tags": { "waterway": "river" },
+          "categories": ["river"]
+        },
+        {
+          "ref": "osm:r304751",
+          "id": "country.192",
+          "text": "Indonesia",
+          "country_code": "id",
+          "wikidata": "Q252",
+          "kind": "admin_area"
+        },
+        {
+          "ref": "osm:n36966065",
+          "id": "continental_marine.5",
+          "text": "Asia",
+          "wikidata": "Q48",
+          "feature_tags": {
+            "sqkm": "44614500",
+            "place": "continent",
+            "wikipedia": "en:Asia",
+            "population": "4950360147"
+          },
+          "categories": ["continent"]
+        }
+      ]
+    }
+  ],
+  "query": ["kuala", "lumpur"],
+  "attribution": "<a href=\"https://www.maptiler.com/copyright/\" target=\"_blank\">&copy; MapTiler</a> <a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\">&copy; OpenStreetMap contributors</a>"
+}

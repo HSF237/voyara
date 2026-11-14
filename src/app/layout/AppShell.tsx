@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Outlet, ScrollRestoration, useLocation } from 'react-router-dom';
+import { Link, Outlet, ScrollRestoration, useLocation } from 'react-router-dom';
+import { paths } from '@/app/paths';
 import { Header } from './Header';
 
 export function AppShell() {
@@ -32,7 +33,13 @@ export function AppShell() {
           <span className="mx-2" aria-hidden="true">
             ·
           </span>
-          {t('app.tagline')}
+          <span className="truncate">{t('app.tagline')}</span>
+          <Link
+            to={paths.design}
+            className="ms-auto shrink-0 rounded-sm font-medium underline-offset-4 hover:text-ink hover:underline"
+          >
+            {t('nav.design')}
+          </Link>
         </div>
       </footer>
       <ScrollRestoration />

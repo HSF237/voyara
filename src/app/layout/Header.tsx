@@ -1,4 +1,4 @@
-import { Languages, Moon, Settings, Sun } from 'lucide-react';
+import { Languages, MapPinPlus, Moon, Settings, Sun } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, NavLink } from 'react-router-dom';
 import { paths } from '@/app/paths';
@@ -31,17 +31,20 @@ export function Header() {
           </span>
         </Link>
 
-        <nav aria-label={t('nav.main')} className="hidden sm:block">
+        <nav aria-label={t('nav.main')}>
+          {/* Phones get an icon; the label is long in some languages. */}
           <NavLink
-            to={paths.design}
+            to={paths.setup}
+            aria-label={t('nav.plan')}
             className={({ isActive }) =>
               cn(
-                'inline-flex h-9 items-center rounded-full px-3.5 text-sm font-semibold transition-colors',
-                isActive ? 'bg-surface-2 text-ink' : 'text-muted hover:text-ink',
+                buttonStyles({ size: 'sm', variant: isActive ? 'secondary' : 'primary' }),
+                'max-sm:size-11 max-sm:px-0',
               )
             }
           >
-            {t('nav.design')}
+            <MapPinPlus className="size-5 sm:hidden" aria-hidden="true" />
+            <span className="hidden sm:inline">{t('nav.plan')}</span>
           </NavLink>
         </nav>
 

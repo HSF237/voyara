@@ -1,11 +1,15 @@
 {
-  "app": { "name": "Voyara", "tagline": "The plan that keeps working" },
+  "app": {
+    "name": "Voyara",
+    "tagline": "The plan that keeps working"
+  },
   "nav": {
     "home": "Home",
     "settings": "Settings",
     "design": "Design system",
     "skip": "Skip to content",
-    "main": "Main menu"
+    "main": "Main menu",
+    "plan": "Plan a trip"
   },
   "header": {
     "toLight": "Switch to light theme",
@@ -17,29 +21,51 @@
     "titleLead": "Other apps make you a plan.",
     "titleEmphasis": "Voyara keeps it working.",
     "body": "Even when the weather, the crowd, or your friends change their minds.",
-    "stepsLabel": "How it works",
-    "steps": {
-      "one": {
-        "title": "Where & when",
-        "body": "Pick a place and your dates. That's the whole form."
-      },
-      "two": {
+    "searchLabel": "Where do you want to go?",
+    "searchPlaceholder": "Kuala Lumpur, Kochi, Tokyo…",
+    "popular": "Popular",
+    "planThis": "Plan this trip",
+    "dragHint": "Drag to spin",
+    "storyLabel": "How it works",
+    "story": {
+      "swipe": {
         "title": "Swipe what you like",
-        "body": "Real places, one card at a time. Right to keep, left to skip."
+        "body": "Real places, one card at a time. Right to keep, left to skip, up for a must-do."
       },
-      "three": {
-        "title": "Done",
-        "body": "A day-by-day plan that adapts to weather, opening hours and budget."
+      "plan": {
+        "title": "Get a plan that fits",
+        "body": "Stops are grouped by area, ordered to cut travel time, and checked against opening hours and your budget."
+      },
+      "live": {
+        "title": "It keeps itself working",
+        "body": "Rain at three? A place closed on Monday? Voyara spots it and offers a one-tap fix."
       }
     },
-    "ctaDesign": "See the design system",
-    "ctaSettings": "Open settings"
+    "mock": {
+      "keep": "Keep",
+      "skip": "Skip",
+      "rain": "Rain expected 3–5 PM",
+      "swap": "Swap stops",
+      "swapped": "Swapped. Your day still works."
+    },
+    "final": {
+      "title": "Where to first?",
+      "body": "Pick a place. The rest takes about a minute."
+    }
   },
   "settings": {
     "title": "Settings",
     "subtitle": "Saved on this device.",
-    "language": { "label": "Language", "hint": "The whole app switches instantly." },
-    "theme": { "label": "Theme", "light": "Light", "dark": "Dark", "system": "System" },
+    "language": {
+      "label": "Language",
+      "hint": "The whole app switches instantly."
+    },
+    "theme": {
+      "label": "Theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
     "currency": {
       "label": "Home currency",
       "hint": "Prices are also shown in this currency."
@@ -67,5 +93,112 @@
     "crashTitle": "Something went wrong",
     "crashBody": "The app hit an unexpected error. Reloading usually fixes it.",
     "retry": "Try again"
+  },
+  "search": {
+    "searching": "Searching…",
+    "noResults": "No places found. Check the spelling or try a nearby city.",
+    "error": "Search can't be reached right now. Check your connection and try again.",
+    "clear": "Clear",
+    "found": "Places found: {{count}}"
+  },
+  "setup": {
+    "title": "Plan a trip",
+    "subtitle": "Only the destination is required. Everything else starts with a sensible default.",
+    "where": "Where",
+    "when": "When",
+    "who": "Who's going",
+    "interests": "Interests",
+    "optional": "Optional",
+    "interestsHint": "Leave empty for a bit of everything.",
+    "dates": {
+      "length": "Days:",
+      "prev": "Previous month",
+      "next": "Next month",
+      "pickStart": "Tap a start date",
+      "pickEnd": "Now tap the end date",
+      "strip": "Your trip, day by day"
+    },
+    "travellers": {
+      "label": "Travellers",
+      "add": "Add a traveller",
+      "remove": "Remove a traveller"
+    },
+    "crew": {
+      "solo": "Solo trip",
+      "duo": "Trip for two",
+      "small": "Small group",
+      "big": "Big group"
+    },
+    "budget": {
+      "title": "Budget",
+      "total": "Total for the trip",
+      "perPersonDay": "Per person, per day",
+      "inLocal": "In {{country}}",
+      "rateDate": "rate from {{date}}",
+      "rateOffline": "Live rate unavailable right now."
+    },
+    "pace": {
+      "title": "Pace",
+      "relaxed": "Relaxed",
+      "relaxedHint": "2–3 stops a day, long breaks",
+      "balanced": "Balanced",
+      "balancedHint": "4–5 stops a day",
+      "packed": "Packed",
+      "packedHint": "6–7 stops a day, early starts"
+    },
+    "planIt": "Plan it",
+    "needDestination": "Choose a destination first"
+  },
+  "interests": {
+    "food": "Food",
+    "nature": "Nature",
+    "history": "History",
+    "shopping": "Shopping",
+    "nightlife": "Nightlife",
+    "adventure": "Adventure",
+    "family": "Family",
+    "religious": "Religious sites",
+    "photography": "Photography"
+  },
+  "ticket": {
+    "pass": "Trip pass",
+    "destination": "Destination",
+    "choose": "Your destination appears here",
+    "dates": "Dates",
+    "nights": "Nights",
+    "travellers": "Travellers",
+    "pace": "Pace",
+    "budget": "Budget",
+    "weather": "Forecast",
+    "weatherLater": "The forecast opens 16 days before you leave.",
+    "weatherUnavailable": "Forecast unavailable right now.",
+    "weatherChoose": "Choose a destination to see the forecast."
+  },
+  "weather": {
+    "clear": "Clear",
+    "partly": "Partly cloudy",
+    "cloudy": "Cloudy",
+    "fog": "Fog",
+    "drizzle": "Drizzle",
+    "rain": "Rain",
+    "snow": "Snow",
+    "storm": "Thunderstorm"
+  },
+  "trip": {
+    "saved": "Trip saved",
+    "next": "What happens next",
+    "stepDetails": "Trip details",
+    "stepPlaces": "Pick your places",
+    "stepPlan": "Your day-by-day plan",
+    "placesSoon": "The swipe deck is being built next.",
+    "edit": "Edit details",
+    "delete": "Delete trip",
+    "deleteTitle": "Delete this trip?",
+    "deleteBody": "It will be removed from this device.",
+    "deleted": "Trip deleted",
+    "localTime": "Local time there",
+    "rate": "Exchange rate",
+    "forecastTitle": "Forecast for your dates",
+    "rainChance": "Rain chance"
   }
 }

@@ -1,5 +1,5 @@
 import { createBrowserRouter } from 'react-router-dom';
-import { HomePage } from '@/features/landing/HomePage';
+import { LandingPage } from '@/features/landing/LandingPage';
 import { AppShell } from './layout/AppShell';
 import { NotFoundPage } from './NotFoundPage';
 import { PageFallback } from './PageFallback';
@@ -7,8 +7,8 @@ import { paths } from './paths';
 import { RouteError } from './RouteError';
 
 /**
- * The home page ships in the main bundle (it is the first thing people see);
- * every other page is its own chunk, downloaded on first visit.
+ * The landing page ships in the main bundle (it is the first thing people
+ * see); every other page is its own chunk, downloaded on first visit.
  */
 export const router = createBrowserRouter([
   {
@@ -17,7 +17,19 @@ export const router = createBrowserRouter([
     errorElement: <RouteError />,
     hydrateFallbackElement: <PageFallback />,
     children: [
-      { index: true, element: <HomePage /> },
+      { index: true, element: <LandingPage /> },
+      {
+        path: paths.setup,
+        lazy: async () => ({
+          Component: (await import('@/features/setup/SetupPage')).SetupPage,
+        }),
+      },
+      {
+        path: paths.plan,
+        lazy: async () => ({
+          Component: (await import('@/features/plan/PlanPage')).PlanPage,
+        }),
+      },
       {
         path: paths.settings,
         lazy: async () => ({

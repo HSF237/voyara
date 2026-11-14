@@ -6,8 +6,8 @@ friends change their minds.
 A travel-planner PWA built for the 6th International Digital Fest 2027 (Asia Pacific University,
 Kuala Lumpur).
 
-> **Status: Milestone 1 of 12** — project setup, design system, theming, routing and the i18n
-> skeleton. See [Milestones](#milestones).
+> **Status: Milestones 1–3 of 12** — design system, the 3D-globe landing page, and trip setup with
+> live destination search, exchange rates and forecast. See [Milestones](#milestones).
 
 ## Run it
 
@@ -29,21 +29,50 @@ npm run dev        # http://localhost:5173
 | `npm run check`     | Everything above in one go — run before every commit |
 | `npm run format`    | Prettier                                             |
 
-No environment variables are needed yet. When they are, copy `.env.example` to `.env.local`.
+Copy `.env.example` to `.env.local`. Nothing is required yet: destination search, rates and the forecast work without keys.
 
-## What is in Milestone 1
+## What works today
 
-| Page        | What it shows                                                                  |
-| ----------- | ------------------------------------------------------------------------------ |
-| `/`         | Home: the pitch and the three-step story (the 3D globe arrives in Milestone 2) |
-| `/settings` | Language, theme, home currency and units — saved on the device                 |
-| `/design`   | Every colour, type size and component, for checking light / dark / RTL         |
-| anything    | A translated "page not found" screen                                           |
+| Page            | What it does                                                                          |
+| --------------- | ------------------------------------------------------------------------------------- |
+| `/`             | 3D globe with flight arcs; search a destination and the globe flies to it and pins it |
+| `/plan/new`     | Trip setup on one screen: destination, dates, travellers, budget, pace, interests     |
+| `/plan/:tripId` | A saved trip: its trip pass, local time, exchange rate and forecast                   |
+| `/settings`     | Language, theme, home currency and units — saved on the device                        |
+| `/design`       | Every colour, type size and component, for checking light / dark / RTL                |
+
+Trip setup is built from custom widgets: a destination autocomplete, a date-range calendar with
+a day-and-night strip, a traveller stepper with a line-up of figures, a budget slider with live
+conversion to the destination's currency, a pace picker that draws a typical day, and a boarding
+pass that fills in as you choose.
+
+### Live data, no key needed
+
+| Data               | Source                                       | Notes                                      |
+| ------------------ | -------------------------------------------- | ------------------------------------------ |
+| Destination search | Open-Meteo geocoding (GeoNames)              | Falls back to MapTiler if it is down       |
+| Exchange rates     | Frankfurter v2                               | Last rates are kept on the device          |
+| Forecast           | Open-Meteo, 16 days                          | Daily for now; hourly comes in Milestone 7 |
+| Country → currency | Bundled table (`src/lib/countryCurrency.ts`) | Works offline                              |
+
+Every response is validated (`src/services/http.ts`) before the app uses it, with timeouts,
+one retry and a typed error, so a failing service shows a clear message instead of breaking a
+screen.
+
+### 3D and motion
+
+- The globe (`src/features/landing/globe`) is React Three Fiber with custom shaders: dotted
+  continents generated from Natural Earth coastlines, an atmosphere glow, animated flight arcs and
+  a pin that drops on the chosen place. Drag to spin it.
+- three.js loads only after the page is interactive. Devices without WebGL, with two or fewer CPU
+  cores, or in data-saver mode get a still CSS globe instead.
+- GSAP ScrollTrigger and Lenis drive the scroll story and load with it, below the fold.
+- `prefers-reduced-motion` gives a static globe and fades only.
 
 ## Stack
 
-React 18 · TypeScript (strict) · Vite · Tailwind CSS v4 · Framer Motion · React Router ·
-Zustand · TanStack Query · i18next · Zod · Vitest. Backend: Vercel serverless functions in `/api`
+React 18 · TypeScript (strict) · Vite · Tailwind CSS v4 · Framer Motion · React Three Fiber ·
+GSAP + Lenis · React Router · Zustand · TanStack Query · i18next · Zod · date-fns · Vitest. Backend: Vercel serverless functions in `/api`
 plus Firebase (from Milestone 3 and 8).
 
 ## Architecture
@@ -153,17 +182,17 @@ Everything else stays on the server.
 
 Wired up from Milestone 3. Each will be credited in the place sheet and on a "Data sources" page.
 
-| Data            | Source                                    |
-| --------------- | ----------------------------------------- |
-| Maps, geocoding | MapTiler, OpenStreetMap contributors      |
-| Places          | OpenTripMap, Overpass API (OpenStreetMap) |
-| Descriptions    | Wikipedia, Wikivoyage                     |
-| Photos          | Wikimedia Commons, Unsplash               |
-| Routing         | OpenRouteService                          |
-| Weather         | Open-Meteo                                |
-| Currency        | Frankfurter                               |
-| Public holidays | Nager.Date                                |
-| Country basics  | REST Countries                            |
+| Data            | Source                                         |
+| --------------- | ---------------------------------------------- |
+| Maps, geocoding | MapTiler, OpenStreetMap contributors           |
+| Places          | OpenTripMap, Overpass API (OpenStreetMap)      |
+| Descriptions    | Wikipedia, Wikivoyage                          |
+| Photos          | Wikimedia Commons, Unsplash                    |
+| Routing         | OpenRouteService                               |
+| Weather         | Open-Meteo                                     |
+| Currency        | Frankfurter                                    |
+| Public holidays | Nager.Date                                     |
+| Country basics  | REST Countries (v5) — planned for Milestone 10 |
 
 Fonts: Fraunces, Plus Jakarta Sans and Noto Sans (SIL Open Font License), self-hosted via
 Fontsource so they work offline. Icons: Lucide (ISC).
@@ -176,8 +205,8 @@ rewrite. Add the server variables from `.env.example` in the Vercel dashboard.
 ## Milestones
 
 1. ✅ Project setup, design system, theming, routing, i18n skeleton, `.env.example`
-2. Landing page with 3D globe and scroll story
-3. Trip setup and data services
+2. ✅ Landing page with 3D globe and scroll story
+3. ✅ Trip setup and data services (places arrive with the swipe deck)
 4. Swipe deck with real places
 5. Plan view: AI planner, optimiser, timeline, map, drag reorder
 6. Place sheet, budget meter, conflict warnings, AI chat edits
