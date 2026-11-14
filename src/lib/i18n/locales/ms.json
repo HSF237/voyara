@@ -1,0 +1,71 @@
+{
+  "app": { "name": "Voyara", "tagline": "Pelan yang terus berfungsi" },
+  "nav": {
+    "home": "Laman utama",
+    "settings": "Tetapan",
+    "design": "Sistem reka bentuk",
+    "skip": "Langkau ke kandungan",
+    "main": "Menu utama"
+  },
+  "header": {
+    "toLight": "Tukar ke tema cerah",
+    "toDark": "Tukar ke tema gelap",
+    "language": "Bahasa"
+  },
+  "home": {
+    "eyebrow": "Perancang perjalanan AI",
+    "titleLead": "Aplikasi lain buatkan anda pelan.",
+    "titleEmphasis": "Voyara pastikan ia terus berfungsi.",
+    "body": "Walaupun cuaca, orang ramai, atau rakan anda berubah fikiran.",
+    "stepsLabel": "Cara ia berfungsi",
+    "steps": {
+      "one": {
+        "title": "Ke mana & bila",
+        "body": "Pilih destinasi dan tarikh anda. Itu sahaja borangnya."
+      },
+      "two": {
+        "title": "Leret apa yang anda suka",
+        "body": "Tempat sebenar, satu kad pada satu masa. Kanan untuk simpan, kiri untuk langkau."
+      },
+      "three": {
+        "title": "Siap",
+        "body": "Pelan hari demi hari yang menyesuaikan diri dengan cuaca, waktu operasi dan bajet."
+      }
+    },
+    "ctaDesign": "Lihat sistem reka bentuk",
+    "ctaSettings": "Buka tetapan"
+  },
+  "settings": {
+    "title": "Tetapan",
+    "subtitle": "Disimpan pada peranti ini.",
+    "language": { "label": "Bahasa", "hint": "Seluruh aplikasi bertukar serta-merta." },
+    "theme": { "label": "Tema", "light": "Cerah", "dark": "Gelap", "system": "Sistem" },
+    "currency": {
+      "label": "Mata wang asal",
+      "hint": "Harga turut ditunjukkan dalam mata wang ini."
+    },
+    "units": {
+      "label": "Unit",
+      "metric": "Metrik (km, °C)",
+      "imperial": "Imperial (bt, °F)"
+    },
+    "saved": "Disimpan",
+    "reset": "Tetapkan semula kepada lalai",
+    "resetDone": "Tetapan ditetapkan semula"
+  },
+  "common": {
+    "close": "Tutup",
+    "dismiss": "Ketepikan",
+    "loading": "Memuatkan…",
+    "cancel": "Batal",
+    "notifications": "Pemberitahuan"
+  },
+  "errors": {
+    "notFoundTitle": "Halaman ini tidak ditemui",
+    "notFoundBody": "Pautan mungkin sudah lama, atau halaman telah dipindahkan.",
+    "goHome": "Kembali ke laman utama",
+    "crashTitle": "Ada sesuatu yang tidak kena",
+    "crashBody": "Aplikasi mengalami ralat yang tidak dijangka. Memuat semula biasanya menyelesaikannya.",
+    "retry": "Cuba lagi"
+  }
+}

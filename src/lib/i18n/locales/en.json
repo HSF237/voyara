@@ -1,0 +1,71 @@
+{
+  "app": { "name": "Voyara", "tagline": "The plan that keeps working" },
+  "nav": {
+    "home": "Home",
+    "settings": "Settings",
+    "design": "Design system",
+    "skip": "Skip to content",
+    "main": "Main menu"
+  },
+  "header": {
+    "toLight": "Switch to light theme",
+    "toDark": "Switch to dark theme",
+    "language": "Language"
+  },
+  "home": {
+    "eyebrow": "AI travel planner",
+    "titleLead": "Other apps make you a plan.",
+    "titleEmphasis": "Voyara keeps it working.",
+    "body": "Even when the weather, the crowd, or your friends change their minds.",
+    "stepsLabel": "How it works",
+    "steps": {
+      "one": {
+        "title": "Where & when",
+        "body": "Pick a place and your dates. That's the whole form."
+      },
+      "two": {
+        "title": "Swipe what you like",
+        "body": "Real places, one card at a time. Right to keep, left to skip."
+      },
+      "three": {
+        "title": "Done",
+        "body": "A day-by-day plan that adapts to weather, opening hours and budget."
+      }
+    },
+    "ctaDesign": "See the design system",
+    "ctaSettings": "Open settings"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Saved on this device.",
+    "language": { "label": "Language", "hint": "The whole app switches instantly." },
+    "theme": { "label": "Theme", "light": "Light", "dark": "Dark", "system": "System" },
+    "currency": {
+      "label": "Home currency",
+      "hint": "Prices are also shown in this currency."
+    },
+    "units": {
+      "label": "Units",
+      "metric": "Metric (km, °C)",
+      "imperial": "Imperial (mi, °F)"
+    },
+    "saved": "Saved",
+    "reset": "Reset to defaults",
+    "resetDone": "Settings reset"
+  },
+  "common": {
+    "close": "Close",
+    "dismiss": "Dismiss",
+    "loading": "Loading…",
+    "cancel": "Cancel",
+    "notifications": "Notifications"
+  },
+  "errors": {
+    "notFoundTitle": "This page wandered off",
+    "notFoundBody": "The link may be old, or the page may have moved.",
+    "goHome": "Back to home",
+    "crashTitle": "Something went wrong",
+    "crashBody": "The app hit an unexpected error. Reloading usually fixes it.",
+    "retry": "Try again"
+  }
+}
