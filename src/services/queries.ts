@@ -7,6 +7,7 @@ import { getRates } from './currency';
 import { MIN_QUERY_LENGTH, searchPlaces } from './geocoding';
 import { ServiceError } from './http';
 import { forecastWindow, getDailyForecast } from './weather';
+import { getPlaces } from './planner';
 import { findPlacePhoto } from './wiki';
 
 const MINUTE = 60 * 1000;
@@ -86,6 +87,18 @@ export function usePlacePhoto(place: { name: string; country: string } | null | 
     enabled: search.length > 0,
     staleTime: 24 * HOUR,
     gcTime: 24 * HOUR,
+    retry: false,
+  });
+}
+
+/** Real places around a destination, for the swipe deck. Kept for the session once loaded. */
+export function usePlaces(place: { id: string; lat: number; lng: number } | null | undefined) {
+  return useQuery({
+    queryKey: ['places', place?.id],
+    queryFn: ({ signal }) => getPlaces(place as { lat: number; lng: number }, signal),
+    enabled: Boolean(place),
+    staleTime: 6 * HOUR,
+    gcTime: 6 * HOUR,
     retry: false,
   });
 }

@@ -39,6 +39,11 @@ export default tseslint.config(
     rules: { '@typescript-eslint/no-non-null-assertion': 'off' },
   },
   {
+    // Route maths walks arrays by index inside loops that bound the index.
+    files: ['src/planner/**/*.ts', 'api/**/*.ts'],
+    rules: { '@typescript-eslint/no-non-null-assertion': 'off' },
+  },
+  {
     files: ['api/**/*.ts', 'scripts/**/*.ts', '*.config.{ts,js}'],
     languageOptions: { globals: { ...globals.node } },
   },

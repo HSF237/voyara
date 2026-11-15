@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, NavLink, Outlet, ScrollRestoration, useLocation } from 'react-router-dom';
 import { paths } from '@/app/paths';
+import { TopProgress } from '@/app/TopProgress';
 import { useSession } from '@/app/useSession';
 import { UserAvatar } from '@/components/UserAvatar';
 import { buttonStyles, IconButton } from '@/components/ui';
@@ -190,6 +191,7 @@ export function AppLayout() {
           {tripsItem && <TabLink item={tripsItem} />}
         </div>
       </nav>
+      <TopProgress />
       <ScrollRestoration />
     </div>
   );

@@ -20,6 +20,14 @@ function render() {
       <App />
     </StrictMode>,
   );
+  // Hand over from the opening screen in index.html once the app has painted.
+  const splash = document.getElementById('splash');
+  if (splash) {
+    requestAnimationFrame(() => {
+      splash.classList.add('done');
+      setTimeout(() => splash.remove(), 400);
+    });
+  }
 }
 
 // Apply theme, language and direction, then wait for the chosen language's

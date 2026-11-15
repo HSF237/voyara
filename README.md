@@ -6,8 +6,8 @@ friends change their minds.
 A travel-planner PWA built for the 6th International Digital Fest 2027 (Asia Pacific University,
 Kuala Lumpur).
 
-> **Status: Milestones 1–3 of 12, plus the app shell** — sign-in, dashboard and My trips around
-> the 3D-globe landing page and live trip setup. See [Milestones](#milestones).
+> **Status: Milestones 1–5 of 12, plus the app shell** — sign-in, dashboard, trip setup, a swipe
+> deck of real places and an AI-built day-by-day plan with a live map. See [Milestones](#milestones).
 
 ## Run it
 
@@ -35,20 +35,51 @@ Copy `.env.example` to `.env.local`. Nothing is required yet: destination search
 
 Voyara is an app with a public front door:
 
-| Page            | Who       | What it does                                                         |
-| --------------- | --------- | -------------------------------------------------------------------- |
-| `/`             | Anyone    | Landing: 3D globe, trip bar (where / when / who), destination photos |
-| `/login`        | Anyone    | Continue with Google, or as a guest with a name and avatar           |
-| `/home`         | Signed in | Dashboard: trip bar, next-trip countdown, stats, your trips, ideas   |
-| `/trips`        | Signed in | Every saved trip, upcoming and past                                  |
-| `/plan/new`     | Signed in | Trip setup on one screen                                             |
-| `/plan/:tripId` | Signed in | A saved trip: its pass, local time, exchange rate and forecast       |
-| `/settings`     | Signed in | Account, language, theme, home currency and units                    |
-| `/design`       | Anyone    | Every colour, type size and component                                |
+| Page                 | Who       | What it does                                                         |
+| -------------------- | --------- | -------------------------------------------------------------------- |
+| `/`                  | Anyone    | Landing: 3D globe, trip bar (where / when / who), destination photos |
+| `/login`             | Anyone    | Continue with Google, or as a guest with a name and avatar           |
+| `/home`              | Signed in | Dashboard: trip bar, next-trip countdown, stats, your trips, ideas   |
+| `/trips`             | Signed in | Every saved trip, upcoming and past                                  |
+| `/plan/new`          | Signed in | Trip setup on one screen                                             |
+| `/plan/:tripId`      | Signed in | A trip: its details, then the plan being built, then the plan        |
+| `/plan/:tripId/pick` | Signed in | Swipe deck: real places to keep, skip or mark as must-do             |
+| `/settings`          | Signed in | Account, language, theme, home currency and units                    |
+| `/design`            | Anyone    | Every colour, type size and component                                |
 
 Signed-in pages share an app shell: a sidebar on wide screens, a top bar and bottom tab bar on
 phones (`src/app/layout/AppLayout.tsx`). Opening one without a profile sends you to sign-in and
 back again afterwards.
+
+### From places to a plan
+
+1. **Pick** (`/plan/:tripId/pick`) — `GET /api/places` returns real places around the destination
+   from OpenTripMap (OpenStreetMap + Wikipedia data): famous ones first, a mix of categories, each
+   with a photo, a short description and a typical visit length. Swipe right to keep, left to
+   skip, up for a must-do (or use the buttons or arrow keys). "Pick for me" fills the trip.
+2. **Plan** — `POST /api/plan` sends the kept places to the AI planner (Gemini). The AI decides
+   **only** which day each place goes on, the order, and a few words (a theme per day, a tip per
+   stop, a summary). It can refer to places only by the ids it was given.
+3. **Check** — the answer is validated (Zod). Unknown or repeated ids are dropped, missing
+   must-dos are added to the nearest day, each day's route is tightened, and **every time and
+   travel estimate is computed in code** (`src/planner/optimise.ts`), never by the AI.
+4. **Fallback** — if the AI is unavailable, slow or wrong, the built-in planner (group by area →
+   nearest-neighbour + 2-opt → schedule) produces the plan instead, on the server or, when offline,
+   on the device. The plan page says which one made it.
+5. **Use** — day tabs with the forecast, a timeline with travel between stops and a lunch break,
+   a live map (MapLibre + MapTiler) with the numbered route, and move / remove on every stop with
+   the day re-timed straight away.
+
+The server functions live in `/api` and run on Vercel. `npm run dev` and `npm run preview` run
+them too (see `apiRoutes` in `vite.config.ts`), so no extra tool is needed locally. Keys for
+OpenTripMap and Gemini are read from `.env.local` on the server side only.
+
+### Loading
+
+The first thing on screen is an opening mark drawn by the browser before any JavaScript arrives
+(`index.html`); the app's own page loader is the same mark, so a cold start is one continuous
+moment. Moving between pages shows a slim progress bar, photos fade in over a shimmer, and the
+map library downloads only when a plan is opened.
 
 ### Sign-in
 
@@ -237,8 +268,9 @@ rewrite. Add the server variables from `.env.example` in the Vercel dashboard.
 1. ✅ Project setup, design system, theming, routing, i18n skeleton, `.env.example`
 2. ✅ Landing page with 3D globe and scroll story
 3. ✅ Trip setup and data services (places arrive with the swipe deck)
-4. Swipe deck with real places
-5. Plan view: AI planner, optimiser, timeline, map, drag reorder
+4. ✅ Swipe deck with real places
+5. ✅ Plan view: AI planner, optimiser, timeline, map (stops move with buttons; drag comes with
+   Milestone 6)
 6. Place sheet, budget meter, conflict warnings, AI chat edits
 7. Live re-planning and demo controls
 8. Group mode (Firestore real-time, QR)

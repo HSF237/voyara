@@ -1,12 +1,13 @@
 import { motion } from 'framer-motion';
-import { Check, Clock, Coins, Pencil, Trash2 } from 'lucide-react';
+import { Check, Clock, Coins, Pencil, Sparkles, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { NotFoundPage } from '@/app/NotFoundPage';
-import { paths } from '@/app/paths';
+import { paths, pickPath } from '@/app/paths';
 import { usePageTitle } from '@/app/usePageTitle';
 import { Badge, Button, Card, Modal, toast } from '@/components/ui';
+import { buttonStyles } from '@/components/ui/button.styles';
 import { DayStrip } from '@/features/setup/DayStrip';
 import { TripPass } from '@/features/trip/TripPass';
 import { useTripForecast } from '@/features/trip/useTripForecast';
@@ -16,7 +17,10 @@ import { formatDateRange } from '@/lib/dates';
 import { useRates } from '@/services/queries';
 import { useTripDraft } from '@/store/tripDraft';
 import { useTrips } from '@/store/trips';
-import type { Trip } from '@/features/trip/model';
+import type { Trip, TripPicks } from '@/features/trip/model';
+import type { Plan } from '@/planner/types';
+import { Generating } from './Generating';
+import { Itinerary } from './Itinerary';
 
 function formatLocalTime(now: Date, timezone: string, language: string): string | null {
   try {
@@ -44,10 +48,6 @@ function LocalTime({ timezone, language }: { timezone: string; language: string 
 function TripView({ trip }: { trip: Trip }) {
   const { t, i18n } = useTranslation();
   const language = i18n.language;
-  const navigate = useNavigate();
-  const removeTrip = useTrips((state) => state.removeTrip);
-  const loadTrip = useTripDraft((state) => state.loadTrip);
-  const [confirming, setConfirming] = useState(false);
   usePageTitle(trip.destination.name);
 
   const forecast = useTripForecast(trip.destination, trip.startDate, trip.endDate);
@@ -125,7 +125,13 @@ function TripView({ trip }: { trip: Trip }) {
                       {t(`trip.${step.key}`)}
                     </p>
                     {step.state === 'current' && (
-                      <p className="mt-0.5 text-sm text-muted">{t('trip.placesSoon')}</p>
+                      <>
+                        <p className="mt-0.5 text-sm text-muted">{t('trip.placesSoon')}</p>
+                        <Link to={pickPath(trip.id)} className={cn(buttonStyles(), 'mt-3')}>
+                          <Sparkles className="size-4" aria-hidden="true" />
+                          {t('plan.startPicking')}
+                        </Link>
+                      </>
                     )}
                   </div>
                 </li>
@@ -183,27 +189,40 @@ function TripView({ trip }: { trip: Trip }) {
           )}
 
           <div className="flex flex-wrap gap-3 pt-2">
-            <Button
-              variant="secondary"
-              iconStart={<Pencil className="size-4" aria-hidden="true" />}
-              onClick={() => {
-                loadTrip(trip);
-                void navigate(paths.setup);
-              }}
-            >
-              {t('trip.edit')}
-            </Button>
-            <Button
-              variant="ghost"
-              iconStart={<Trash2 className="size-4" aria-hidden="true" />}
-              onClick={() => setConfirming(true)}
-            >
-              {t('trip.delete')}
-            </Button>
+            <TripActions trip={trip} />
           </div>
         </div>
       </div>
+    </div>
+  );
+}
 
+/** Edit and delete, with the delete confirmation. Used under the trip pass and under the plan. */
+function TripActions({ trip }: { trip: Trip }) {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const removeTrip = useTrips((state) => state.removeTrip);
+  const loadTrip = useTripDraft((state) => state.loadTrip);
+  const [confirming, setConfirming] = useState(false);
+  return (
+    <>
+      <Button
+        variant="secondary"
+        iconStart={<Pencil className="size-4" aria-hidden="true" />}
+        onClick={() => {
+          loadTrip(trip);
+          void navigate(paths.setup);
+        }}
+      >
+        {t('trip.edit')}
+      </Button>
+      <Button
+        variant="ghost"
+        iconStart={<Trash2 className="size-4" aria-hidden="true" />}
+        onClick={() => setConfirming(true)}
+      >
+        {t('trip.delete')}
+      </Button>
       <Modal
         open={confirming}
         onClose={() => setConfirming(false)}
@@ -229,13 +248,26 @@ function TripView({ trip }: { trip: Trip }) {
           </>
         }
       />
-    </div>
+    </>
   );
 }
 
-/** A saved trip. For now: the pass, live facts and what comes next. */
+function PlannedTrip({ trip, picks, plan }: { trip: Trip; picks: TripPicks; plan: Plan }) {
+  usePageTitle(trip.destination.name);
+  return <Itinerary trip={trip} picks={picks} plan={plan} footer={<TripActions trip={trip} />} />;
+}
+
+/** A trip's page: its details until places are picked, then the plan being built, then the plan. */
 export function PlanPage() {
   const { tripId } = useParams();
   const trip = useTrips((state) => state.trips.find((item) => item.id === tripId));
-  return trip ? <TripView trip={trip} /> : <NotFoundPage />;
+  if (!trip) return <NotFoundPage />;
+  if (trip.picks && trip.picks.places.length > 0) {
+    return trip.plan ? (
+      <PlannedTrip trip={trip} picks={trip.picks} plan={trip.plan} />
+    ) : (
+      <Generating key={trip.id} trip={trip} picks={trip.picks} />
+    );
+  }
+  return <TripView trip={trip} />;
 }

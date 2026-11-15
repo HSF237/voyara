@@ -1,20 +1,16 @@
 import { useTranslation } from 'react-i18next';
-import { Skeleton, SkeletonText } from '@/components/ui';
+import { LoaderMark } from '@/components/Loader';
 
-/** Shown while a lazily loaded page's code is downloading. */
+/**
+ * Shown while a page's code is downloading. It looks exactly like the opening
+ * screen in index.html, so a cold start reads as one continuous moment.
+ */
 export function PageFallback() {
   const { t } = useTranslation();
-
   return (
-    <div className="container-page py-12" role="status">
+    <div role="status" className="fixed inset-0 z-40 grid place-items-center bg-bg">
       <span className="sr-only">{t('common.loading')}</span>
-      <Skeleton className="h-10 w-2/3 max-w-md" />
-      <SkeletonText className="mt-6 max-w-xl" lines={3} />
-      <div className="mt-10 grid gap-4 sm:grid-cols-3">
-        <Skeleton className="h-36 rounded-xl" />
-        <Skeleton className="h-36 rounded-xl" />
-        <Skeleton className="h-36 rounded-xl" />
-      </div>
+      <LoaderMark className="size-18" />
     </div>
   );
 }

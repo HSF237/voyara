@@ -1,3 +1,4 @@
+import type { Plan, PlaceCandidate } from '@/planner/types';
 import type { Place } from '@/services/geocoding';
 
 export const PACES = ['relaxed', 'balanced', 'packed'] as const;
@@ -35,11 +36,16 @@ export type TripDetails = {
   interests: Interest[];
 };
 
+/** The places a traveller kept from the swipe deck. Stored whole, so the plan works offline. */
+export type TripPicks = { places: PlaceCandidate[]; mustIds: string[] };
+
 export type Trip = TripDetails & {
   id: string;
   /** Short human-friendly reference shown on the trip pass, e.g. "VY-7K2QF". */
   code: string;
   createdAt: string;
+  picks?: TripPicks;
+  plan?: Plan;
 };
 
 const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no look-alikes (0/O, 1/I)

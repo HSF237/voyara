@@ -67,6 +67,10 @@ export const router = createBrowserRouter([
         lazy: async () => ({ Component: (await import('@/features/plan/PlanPage')).PlanPage }),
       },
       {
+        path: paths.pick,
+        lazy: async () => ({ Component: (await import('@/features/pick/PickPage')).PickPage }),
+      },
+      {
         path: paths.settings,
         lazy: async () => ({
           Component: (await import('@/features/settings/SettingsPage')).SettingsPage,

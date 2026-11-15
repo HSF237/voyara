@@ -4,8 +4,9 @@
  * Public:  /  (landing)   /login   /design
  * App (needs a profile): /home  /trips  /plan/new  /plan/:tripId  /settings
  *
+ *                        /plan/:tripId/pick  (swipe deck)
+ *
  * Planned (later milestones):
- *   /plan/:tripId/swipe  swipe deck
  *   /plan/:tripId/today  trip-day mode
  *   /group/:roomId       group planning room
  *   /trip/:tripId        public read-only share page
@@ -18,11 +19,13 @@ export const paths = {
   trips: '/trips',
   setup: '/plan/new',
   plan: '/plan/:tripId',
+  pick: '/plan/:tripId/pick',
   settings: '/settings',
   design: '/design',
 } as const;
 
 export const planPath = (tripId: string) => `/plan/${encodeURIComponent(tripId)}`;
+export const pickPath = (tripId: string) => `${planPath(tripId)}/pick`;
 
 /** Only in-app paths are accepted as the place to go after sign-in (no open redirects). */
 export function safeNext(next: string | null): string {

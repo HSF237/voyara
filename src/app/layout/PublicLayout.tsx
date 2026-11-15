@@ -3,6 +3,7 @@ import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, Outlet, ScrollRestoration, useLocation } from 'react-router-dom';
 import { paths } from '@/app/paths';
+import { TopProgress } from '@/app/TopProgress';
 import { buttonStyles } from '@/components/ui';
 import { useAuth } from '@/store/auth';
 import { LanguageSelect, ThemeToggle } from './controls';
@@ -73,6 +74,7 @@ export function PublicLayout() {
           </Link>
         </div>
       </footer>
+      <TopProgress />
       <ScrollRestoration />
     </div>
   );
