@@ -198,3 +198,73 @@ describe('POST /api/plan', () => {
     );
   });
 });
+
+describe('POST /api/edit', () => {
+  const stop = (id: string, must = false) => ({
+    id,
+    name: `Place ${id}`,
+    category: 'culture',
+    ...(must ? { must } : {}),
+  });
+  const body = {
+    request: 'Make day 1 lighter',
+    destination: { name: 'Kuala Lumpur', country: 'Malaysia' },
+    pace: 'balanced',
+    language: 'en',
+    currentDay: 1,
+    days: [
+      {
+        date: '2026-11-21',
+        theme: 'Museums',
+        rainChance: 70,
+        stops: [stop('a', true), stop('b'), stop('c')],
+      },
+      { date: '2026-11-22', stops: [stop('d')] },
+    ],
+    spare: [stop('e')],
+  };
+  const call = async (payload: unknown) =>
+    (await import('../api/edit')).POST(
+      new Request('http://x/api/edit', { method: 'POST', body: JSON.stringify(payload) }),
+    );
+  const gemini = (answer: unknown) =>
+    reply({ candidates: [{ content: { parts: [{ text: JSON.stringify(answer) }] } }] });
+
+  it('returns only well-formed operations on places it was given', async () => {
+    fetchMock.mockResolvedValue(
+      gemini({
+        reply: 'Moved one museum to day 2.',
+        ops: [
+          { op: 'move', id: 'c', toDay: 2 },
+          { op: 'move', id: 'INVENTED', toDay: 2 },
+          { op: 'move', id: 'b', toDay: 7 },
+          { op: 'add', id: 'e', withDay: 2 }, // a looser answer: still understood
+          { op: 'swapDays', dayA: 1, dayB: 2 },
+          { op: 'delete_everything' },
+        ],
+      }),
+    );
+    const response = await call(body);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({
+      reply: 'Moved one museum to day 2.',
+      ops: [
+        { op: 'move', id: 'c', day: 2 },
+        { op: 'add', id: 'e', day: 2 },
+        { op: 'swapDays', day: 1, withDay: 2 },
+      ],
+    });
+    const sent = String(fetchMock.mock.calls[0]?.[1]?.body);
+    expect(sent).toContain('Make day 1 lighter');
+    expect(sent).toContain('rain chance 70%');
+    expect(sent).toContain('MUST');
+  });
+
+  it('answers 503 when the AI is unavailable or not set up, and 400 for bad input', async () => {
+    fetchMock.mockResolvedValue(reply({}, 503));
+    expect((await call(body)).status).toBe(503);
+    vi.stubEnv('GEMINI_API_KEY', '');
+    expect((await call(body)).status).toBe(503);
+    expect((await call({ ...body, request: '' })).status).toBe(400);
+  });
+});

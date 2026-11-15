@@ -17,6 +17,7 @@ import { daysOfTrip } from '@/lib/dates';
 import { scorePlace } from '@/planner/categories';
 import { PACE_RULES } from '@/planner/optimise';
 import type { PlaceCandidate } from '@/planner/types';
+import { ServiceError } from '@/services/http';
 import { usePlaces } from '@/services/queries';
 import { useTrips } from '@/store/trips';
 import { SwipeCard, type Verdict } from './SwipeCard';
@@ -355,6 +356,8 @@ export function PickPage() {
 
   if (!trip) return <NotFoundPage />;
   const name = trip.destination.name;
+  // 503 means the server has no key for the places source: a deployment step, not a network fault.
+  const notSetUp = places.error instanceof ServiceError && places.error.status === 503;
 
   return (
     <div className="container-page py-5 sm:py-10">
@@ -387,8 +390,10 @@ export function PickPage() {
 
       {places.isError && (
         <Card className="mx-auto mt-10 max-w-md text-center">
-          <h2 className="font-display text-xl font-medium text-ink">{t('pick.errorTitle')}</h2>
-          <p className="mt-2 text-muted">{t('pick.errorBody')}</p>
+          <h2 className="font-display text-xl font-medium text-ink">
+            {t(notSetUp ? 'pick.setupTitle' : 'pick.errorTitle')}
+          </h2>
+          <p className="mt-2 text-muted">{t(notSetUp ? 'pick.setupBody' : 'pick.errorBody')}</p>
           <Button className="mt-6" onClick={() => void places.refetch()}>
             {t('pick.retry')}
           </Button>

@@ -2,6 +2,7 @@ import * as z from 'zod/mini';
 import type { Trip, TripPicks } from '@/features/trip/model';
 import { daysOfTrip } from '@/lib/dates';
 import { scorePlace } from '@/planner/categories';
+import type { EditOp } from '@/planner/edit';
 import { buildPlan, type PlanInput } from '@/planner/optimise';
 import { CATEGORIES, type Plan, type PlaceCandidate } from '@/planner/types';
 import { fetchJson } from './http';
@@ -134,4 +135,78 @@ export async function makePlan(
     console.warn('AI planner unavailable; using the built-in planner.', error);
     return buildPlan(input);
   }
+}
+
+const editSchema = z.object({
+  reply: z.string(),
+  ops: z.array(
+    z.object({
+      op: z.enum(['move', 'add', 'remove', 'swapDays']),
+      id: text,
+      day: z.optional(z.number()),
+      withDay: z.optional(z.number()),
+    }),
+  ),
+});
+
+export type EditAnswer = { reply: string; ops: EditOp[] };
+
+/**
+ * Asks the AI editor to turn a request in plain words into edit operations.
+ * It only proposes; the caller applies them with applyEdits, which checks each
+ * one. Throws when the editor cannot be reached — there is no guessing here.
+ */
+export async function requestEdit(
+  trip: Trip,
+  picks: TripPicks,
+  plan: Plan,
+  options: {
+    request: string;
+    currentDay: number;
+    language: string;
+    rainChance?: (date: string) => number | null | undefined;
+  },
+  signal?: AbortSignal,
+): Promise<EditAnswer> {
+  const byId = new Map(picks.places.map((place) => [place.id, place]));
+  const must = new Set(picks.mustIds);
+  const brief = (id: string) => {
+    const place = byId.get(id);
+    return place
+      ? [
+          {
+            id,
+            name: place.name,
+            category: place.category,
+            ...(must.has(id) ? { must: true } : {}),
+          },
+        ]
+      : [];
+  };
+  const planned = new Set(plan.days.flatMap((day) => day.stops.map((stop) => stop.placeId)));
+  const response = await fetch('/api/edit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    signal: signal ?? AbortSignal.timeout(45_000),
+    body: JSON.stringify({
+      request: options.request,
+      destination: { name: trip.destination.name, country: trip.destination.country },
+      pace: trip.pace,
+      language: options.language,
+      currentDay: options.currentDay,
+      days: plan.days.map((day) => ({
+        date: day.date,
+        ...(day.theme ? { theme: day.theme } : {}),
+        rainChance: options.rainChance?.(day.date) ?? null,
+        stops: day.stops.flatMap((stop) => brief(stop.placeId)),
+      })),
+      spare: picks.places
+        .filter((place) => !planned.has(place.id))
+        .flatMap((place) => brief(place.id)),
+    }),
+  });
+  if (!response.ok) throw new Error(`edit service answered ${response.status}`);
+  const parsed = editSchema.safeParse(await response.json());
+  if (!parsed.success) throw new Error('edit service sent an unexpected shape');
+  return { reply: parsed.data.reply, ops: parsed.data.ops as EditOp[] };
 }

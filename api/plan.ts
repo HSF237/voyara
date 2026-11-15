@@ -2,7 +2,8 @@ import * as z from 'zod';
 import { scorePlace } from '../src/planner/categories.js';
 import { buildPlan, PACE_RULES, planFromOutline, type PlanInput } from '../src/planner/optimise.js';
 import { CATEGORIES, type DayOutline, type PlaceCandidate } from '../src/planner/types.js';
-import { fetchWithTimeout, json, problem, tooMany } from './_lib/http.js';
+import { askGemini } from './_lib/gemini.js';
+import { json, problem, tooMany } from './_lib/http.js';
 
 /**
  * POST /api/plan
@@ -56,19 +57,6 @@ const LANGUAGE_NAMES = {
   ta: 'Tamil',
 };
 
-// Tried in order: the first that answers wins. The light models answer in a few seconds and
-// handle this task well; a model that is overloaded is skipped for the next one. GEMINI_MODEL (one name, or several separated by commas) is tried before these.
-const MODELS = [
-  ...(process.env.GEMINI_MODEL ?? '')
-    .split(',')
-    .map((name) => name.trim())
-    .filter(Boolean),
-  'gemini-flash-lite-latest',
-  'gemini-3.5-flash-lite',
-  'gemini-3.5-flash',
-];
-const TIME_LIMITS_MS = [14_000, 12_000, 16_000, 12_000];
-
 function prompt(input: z.infer<typeof body>): string {
   const perDay = PACE_RULES[input.pace].stopsPerDay;
   const must = new Set(input.mustIds);
@@ -119,39 +107,6 @@ const responseSchema = {
   required: ['summary', 'days'],
 };
 
-async function askGemini(text: string, key: string): Promise<{ model: string; data: z.infer<typeof outline> } | null> {
-  for (const [attempt, model] of MODELS.slice(0, 4).entries()) {
-    try {
-      const response = await fetchWithTimeout(
-        `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
-          body: JSON.stringify({
-            contents: [{ role: 'user', parts: [{ text }] }],
-            generationConfig: { temperature: 0.4, responseMimeType: 'application/json', responseSchema },
-          }),
-        },
-        TIME_LIMITS_MS[attempt] ?? 12_000,
-      );
-      if (!response.ok) {
-        console.warn(`[api/plan] ${model} answered ${response.status}`);
-        continue;
-      }
-      const payload = (await response.json()) as {
-        candidates?: { content?: { parts?: { text?: string }[] } }[];
-      };
-      const raw = payload.candidates?.[0]?.content?.parts?.map((part) => part.text ?? '').join('') ?? '';
-      const parsed = outline.safeParse(JSON.parse(raw));
-      if (parsed.success) return { model, data: parsed.data };
-      console.warn(`[api/plan] ${model} sent an unexpected shape`);
-    } catch (error) {
-      console.warn(`[api/plan] ${model} failed:`, error instanceof Error ? error.message : error);
-    }
-  }
-  return null;
-} // prettier-ignore
-
 export async function POST(request: Request): Promise<Response> {
   if (tooMany(request, 'plan', 12, 60_000)) return problem(429, 'slow_down', 'Too many requests.');
 
@@ -177,7 +132,7 @@ export async function POST(request: Request): Promise<Response> {
 
   const key = process.env.GEMINI_API_KEY;
   if (key && (process.env.AI_PROVIDER ?? 'gemini') === 'gemini') {
-    const answer = await askGemini(prompt(input), key);
+    const answer = await askGemini(prompt(input), key, responseSchema, outline, 'plan');
     if (answer) {
       const plan = planFromOutline(answer.data.days as DayOutline[], planInput, {
         model: answer.model,

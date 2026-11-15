@@ -70,9 +70,27 @@ back again afterwards.
    a live map (MapLibre + MapTiler) with the numbered route, and move / remove on every stop with
    the day re-timed straight away.
 
+6. **Change it in words** — "Ask Voyara" (`POST /api/edit`) turns a request such as "make day 2
+   lighter" into a few operations (move, add, remove, swap days). The AI only proposes; the app
+   checks each one against the places you kept, applies it, re-times the days, and keeps the
+   previous plan for one-tap undo (`src/planner/edit.ts`). Its reply is shown only when a change
+   really went through.
+7. **Warnings** — each day is checked in code (`src/planner/checks.ts`): rain forecast on a day
+   with outdoor stops, a day that ends late, too many stops for the pace, one very long hop.
+
 The server functions live in `/api` and run on Vercel. `npm run dev` and `npm run preview` run
 them too (see `apiRoutes` in `vite.config.ts`), so no extra tool is needed locally. Keys for
 OpenTripMap and Gemini are read from `.env.local` on the server side only.
+
+### Deploying to Vercel
+
+The site builds without any keys, but then sign-in, the map, real places and the AI are all off.
+In the Vercel project: **Settings → Environment Variables**, add every line of your `.env.local`
+(the "Import .env" button takes the whole file at once), for Production and Preview, then
+**Deployments → ⋯ → Redeploy**. Names starting with `VITE_` are built into the page; the rest
+(`GEMINI_API_KEY`, `OPENTRIPMAP_API_KEY`, `ORS_API_KEY`, …) stay on the server. Finally add the
+Vercel domain in Firebase → Authentication → Settings → Authorised domains, or Google sign-in
+will refuse it.
 
 ### Loading
 
@@ -269,9 +287,8 @@ rewrite. Add the server variables from `.env.example` in the Vercel dashboard.
 2. ✅ Landing page with 3D globe and scroll story
 3. ✅ Trip setup and data services (places arrive with the swipe deck)
 4. ✅ Swipe deck with real places
-5. ✅ Plan view: AI planner, optimiser, timeline, map (stops move with buttons; drag comes with
-   Milestone 6)
-6. Place sheet, budget meter, conflict warnings, AI chat edits
+5. ✅ Plan view: AI planner, optimiser, timeline, map (stops move with buttons)
+6. Place sheet, budget meter, drag reorder — ✅ conflict warnings and AI chat edits are in
 7. Live re-planning and demo controls
 8. Group mode (Firestore real-time, QR)
 9. Trip-day mode and offline PWA

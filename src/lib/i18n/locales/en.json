@@ -316,7 +316,9 @@
     "keys": "Keyboard: ← skip, → keep, ↑ must-do",
     "visit": "Visit: {{count}} min",
     "readMore": "Read more on Wikipedia",
-    "photo": "Photo: Wikimedia Commons"
+    "photo": "Photo: Wikimedia Commons",
+    "setupTitle": "The places service isn't set up",
+    "setupBody": "The server is missing OPENTRIPMAP_API_KEY. Add it to the environment variables and redeploy."
   },
   "cats": {
     "culture": "Culture",
@@ -349,5 +351,25 @@
     "mapLabel": "Map of this day's route",
     "updated": "Plan updated",
     "yourPlan": "Your plan"
+  },
+  "ask": {
+    "title": "Ask Voyara",
+    "placeholder": "Change the plan in your own words",
+    "send": "Send",
+    "s1": "Make this day lighter",
+    "s2": "Move outdoor places to the driest day",
+    "s3": "Balance the days",
+    "thinking": "Working on it…",
+    "undo": "Undo",
+    "failed": "The AI editor is busy. Try again in a moment, or change the plan by hand.",
+    "changed": "Changes: {{count}}",
+    "nothing": "Nothing was changed. Try naming a place or a day from this plan."
+  },
+  "warn": {
+    "rain": "Rain is likely ({{chance}}%). Outdoor stops this day: {{count}}.",
+    "late": "This day ends at {{time}}. Consider moving a stop to another day.",
+    "travel": "About {{count}} min of travel this day.",
+    "packed": "Stops: {{count}}. Your pace suggests {{limit}} a day.",
+    "longHop": "Getting to {{place}} takes about {{count}} min. It may fit better on another day."
   }
 }

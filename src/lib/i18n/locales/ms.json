@@ -316,7 +316,9 @@
     "keys": "Papan kekunci: ← langkau, → simpan, ↑ wajib pergi",
     "visit": "Lawatan: {{count}} min",
     "readMore": "Baca lagi di Wikipedia",
-    "photo": "Foto: Wikimedia Commons"
+    "photo": "Foto: Wikimedia Commons",
+    "setupTitle": "Perkhidmatan tempat belum disediakan",
+    "setupBody": "Pelayan tiada OPENTRIPMAP_API_KEY. Tambahkannya pada pemboleh ubah persekitaran dan deploy semula."
   },
   "cats": {
     "culture": "Budaya",
@@ -349,5 +351,25 @@
     "mapLabel": "Peta laluan hari ini",
     "updated": "Pelan dikemas kini",
     "yourPlan": "Pelan anda"
+  },
+  "ask": {
+    "title": "Tanya Voyara",
+    "placeholder": "Ubah pelan dengan kata-kata anda sendiri",
+    "send": "Hantar",
+    "s1": "Ringankan hari ini",
+    "s2": "Alihkan tempat luar ke hari paling kering",
+    "s3": "Seimbangkan hari-hari",
+    "thinking": "Sedang diusahakan…",
+    "undo": "Buat asal",
+    "failed": "Editor AI sedang sibuk. Cuba sebentar lagi, atau ubah pelan secara manual.",
+    "changed": "Perubahan: {{count}}",
+    "nothing": "Tiada yang diubah. Cuba sebut tempat atau hari daripada pelan ini."
+  },
+  "warn": {
+    "rain": "Hujan dijangka ({{chance}}%). Hentian luar hari ini: {{count}}.",
+    "late": "Hari ini tamat pada {{time}}. Pertimbangkan untuk alihkan satu hentian ke hari lain.",
+    "travel": "Kira-kira {{count}} min perjalanan hari ini.",
+    "packed": "Hentian: {{count}}. Rentak anda mencadangkan {{limit}} sehari.",
+    "longHop": "Perjalanan ke {{place}} mengambil kira-kira {{count}} min. Mungkin lebih sesuai pada hari lain."
   }
 }

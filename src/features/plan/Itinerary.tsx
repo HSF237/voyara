@@ -3,8 +3,11 @@ import {
   ArrowDown,
   ArrowUp,
   Car,
+  CloudRain,
+  Clock3,
   Footprints,
   RefreshCw,
+  Route,
   Shuffle,
   Sparkles,
   Star,
@@ -29,10 +32,12 @@ import type { Trip, TripPicks } from '@/features/trip/model';
 import { useTripForecast } from '@/features/trip/useTripForecast';
 import { cn } from '@/lib/cn';
 import { formatDateRange, formatDay } from '@/lib/dates';
+import { checkDay, type DayNotice } from '@/planner/checks';
 import { rescheduleDay } from '@/planner/optimise';
 import type { DayPlan, Plan, PlaceCandidate, PlanStop } from '@/planner/types';
 import { flagEmoji } from '@/services/geocoding';
 import { useTrips } from '@/store/trips';
+import { AskVoyara } from './AskVoyara';
 import { RouteSketch, type RoutePoint } from './RouteSketch';
 
 // The map library is large: it downloads only when a plan is on screen.
@@ -160,6 +165,28 @@ function StopRow({
   );
 } // prettier-ignore
 
+/** One thing worth a second look in the day, in plain words. */
+function Notice({ notice, placeName }: { notice: DayNotice; placeName?: string }) {
+  const { t } = useTranslation();
+  const Icon = notice.code === 'rain' ? CloudRain : notice.code === 'late' ? Clock3 : Route;
+  const text =
+    notice.code === 'rain'
+      ? t('warn.rain', { chance: notice.chance, count: notice.outdoor })
+      : notice.code === 'late'
+        ? t('warn.late', { time: notice.ends })
+        : notice.code === 'packed'
+          ? t('warn.packed', { count: notice.stops, limit: notice.limit })
+          : notice.code === 'longHop'
+            ? t('warn.longHop', { count: notice.minutes, place: placeName ?? '' })
+            : t('warn.travel', { count: notice.minutes });
+  return (
+    <li className="flex items-start gap-2.5 rounded-lg bg-accent-soft px-3.5 py-2.5 text-sm text-ink">
+      <Icon className="mt-0.5 size-4 shrink-0 text-accent-ink" aria-hidden="true" />
+      <span>{text}</span>
+    </li>
+  );
+}
+
 type ItineraryProps = {
   trip: Trip;
   picks: TripPicks;
@@ -202,6 +229,8 @@ export function Itinerary({ trip, picks, plan, footer }: ItineraryProps) {
     [stops],
   );
   const travelMin = stops.reduce((sum, { stop }) => sum + stop.travelMin, 0);
+  const rainChance = (date: string) => forecast.days?.find((entry) => entry.date === date)?.rainChance;
+  const notices = day ? checkDay(day, picks.places, trip.pace, { rainChance: rainChance(day.date) ?? null }) : [];
   const lunchBefore = day?.lunchAt ? stops.findIndex(({ stop }, index) => index > 0 && stop.start >= (day.lunchAt ?? '')) : -1; // prettier-ignore
 
   function change(ids: string[]) {
@@ -313,6 +342,16 @@ export function Itinerary({ trip, picks, plan, footer }: ItineraryProps) {
           </div>
         </div>
 
+        <div className="mt-6">
+          <AskVoyara
+            trip={trip}
+            picks={picks}
+            plan={plan}
+            currentDay={Math.min(dayIndex, plan.days.length - 1) + 1}
+            rainChance={rainChance}
+          />
+        </div>
+
         <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] lg:items-start xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
           <section aria-labelledby="day-title" className="min-w-0 lg:order-1">
             <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
@@ -324,6 +363,18 @@ export function Itinerary({ trip, picks, plan, footer }: ItineraryProps) {
                 {t('plan.min', { count: travelMin })}
               </p>
             </div>
+
+            {notices.length > 0 && (
+              <ul className="mt-4 space-y-2">
+                {notices.map((notice) => (
+                  <Notice
+                    key={notice.code}
+                    notice={notice}
+                    placeName={notice.code === 'longHop' ? byId.get(notice.placeId)?.name : undefined}
+                  />
+                ))}
+              </ul>
+            )}
 
             {stops.length === 0 ? (
               <div className="mt-6 rounded-xl border border-dashed border-line-strong bg-surface p-8 text-center">

@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { categoryOfKinds, scorePlace } from '@/planner/categories';
+import { checkDay } from '@/planner/checks';
+import { applyEdits } from '@/planner/edit';
 import { distanceKm, estimateLeg } from '@/planner/geo';
 import {
   buildPlan,
@@ -185,5 +187,100 @@ describe('editing a day', () => {
     expect(tidy.stops[1]?.travelMode).toBe('walk');
     const travel = (plan: typeof day) => plan.stops.reduce((sum, stop) => sum + stop.travelMin, 0);
     expect(travel(tidy)).toBeLessThan(travel(day));
+  });
+});
+
+describe('AI edit operations', () => {
+  const all = [...west, ...east];
+  const base = () => buildPlan(input({ pace: 'relaxed' }), new Date('2026-11-14T00:00:00Z'));
+  const idsOf = (plan: ReturnType<typeof base>) =>
+    plan.days.map((day) => day.stops.map((stop) => stop.placeId));
+
+  it('moves, removes and adds only places the traveller kept, and re-times the days', () => {
+    const plan = base();
+    const [first] = idsOf(plan);
+    const mover = first![0]!;
+    const { plan: edited, applied } = applyEdits(
+      plan,
+      [
+        { op: 'move', id: mover, day: 2 },
+        { op: 'remove', id: first![1]! },
+        { op: 'move', id: 'invented', day: 1 },
+        { op: 'move', id: mover, day: 9 },
+        { op: 'add', id: first![2]!, day: 2 }, // already planned: ignored
+      ],
+      all,
+      'relaxed',
+    );
+    expect(applied).toBe(2);
+    const [dayOne, dayTwo] = idsOf(edited);
+    expect(dayOne).toEqual([first![2]]);
+    expect(dayTwo).toHaveLength(4);
+    expect(dayTwo!.at(-1)).toBe(mover);
+    expect(edited.days[0]?.stops[0]?.start).toBe('10:00');
+    expect(edited.days[0]?.stops[0]?.travelMin).toBe(0);
+  });
+
+  it('adds a kept place that was left out, and swaps whole days keeping the dates in place', () => {
+    const plan = base();
+    const spare = place('spare', 10.0015, 76.002);
+    const added = applyEdits(
+      plan,
+      [{ op: 'add', id: 'spare', day: 1 }],
+      [...all, spare],
+      'relaxed',
+    );
+    expect(idsOf(added.plan)[0]).toContain('spare');
+
+    const swapped = applyEdits(plan, [{ op: 'swapDays', day: 1, withDay: 2 }], all, 'relaxed').plan;
+    expect(idsOf(swapped)).toEqual([idsOf(plan)[1], idsOf(plan)[0]]);
+    expect(swapped.days.map((day) => day.date)).toEqual(plan.days.map((day) => day.date));
+  });
+
+  it('returns the same plan when nothing applies', () => {
+    const plan = base();
+    const result = applyEdits(
+      plan,
+      [
+        { op: 'remove', id: 'nope' },
+        { op: 'swapDays', day: 1, withDay: 1 },
+      ],
+      all,
+      'relaxed',
+    );
+    expect(result).toEqual({ plan, applied: 0 });
+  });
+});
+
+describe('day checks', () => {
+  const garden = place('garden', 10, 76, 'nature');
+  const hill = place('hill', 10.4, 76.4, 'views');
+
+  it('flags rain on a day with outdoor stops, and a long hop between far places', () => {
+    const day = scheduleDay('2026-11-21', [garden, hill], 'balanced');
+    const notices = checkDay(day, [garden, hill], 'balanced', { rainChance: 80 });
+    expect(notices).toContainEqual({ code: 'rain', chance: 80, outdoor: 2 });
+    expect(notices.find((notice) => notice.code === 'longHop')).toMatchObject({ placeId: 'hill' });
+    expect(
+      checkDay(day, [garden, hill], 'balanced', { rainChance: 20 }).some(
+        (notice) => notice.code === 'rain',
+      ),
+    ).toBe(false);
+  });
+
+  it('flags a day with more stops than the pace, and one that ends late', () => {
+    const many = Array.from({ length: 9 }, (_, index) => ({
+      ...place(`p${index}`, 10 + index * 0.001, 76),
+      durationMin: 120,
+    }));
+    const notices = checkDay(scheduleDay('2026-11-21', many, 'relaxed'), many, 'relaxed');
+    expect(notices).toContainEqual({ code: 'packed', stops: 9, limit: 3 });
+    expect(notices.some((notice) => notice.code === 'late')).toBe(true);
+  });
+
+  it('says nothing about an ordinary day', () => {
+    expect(
+      checkDay(scheduleDay('2026-11-21', west, 'balanced'), west, 'balanced', { rainChance: 10 }),
+    ).toEqual([]);
   });
 });
