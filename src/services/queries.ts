@@ -7,7 +7,7 @@ import { getRates } from './currency';
 import { MIN_QUERY_LENGTH, searchPlaces } from './geocoding';
 import { ServiceError } from './http';
 import { forecastWindow, getDailyForecast } from './weather';
-import { findPlacePhoto, getPhotosByTitle } from './wiki';
+import { findPlacePhoto } from './wiki';
 
 const MINUTE = 60 * 1000;
 const HOUR = 60 * MINUTE;
@@ -75,19 +75,6 @@ export function useForecast(
     retry: noRetryWhenCancelled,
   });
   return { ...query, window, units };
-}
-
-/** Photos for a fixed set of Wikipedia titles (the destination rail). Cached for a day. */
-export function usePhotosByTitle(titles: readonly string[]) {
-  const key = titles.join('|');
-  return useQuery({
-    queryKey: ['photos', key],
-    queryFn: ({ signal }) => getPhotosByTitle(key ? key.split('|') : [], signal),
-    enabled: key.length > 0,
-    staleTime: 24 * HOUR,
-    gcTime: 24 * HOUR,
-    retry: false,
-  });
 }
 
 /** A photo for any destination, found by name. Null when Wikipedia has no free image. */

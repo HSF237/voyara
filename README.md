@@ -212,6 +212,18 @@ Wired up from Milestone 3. Each will be credited in the place sheet and on a "Da
 | Public holidays | Nager.Date                                     |
 | Country basics  | REST Countries (v5) — planned for Milestone 10 |
 
+### Photos and illustrations
+
+- **Featured destination photos** (banners, "Popular destinations", trip cards, sign-in panel) are
+  the lead images of each place's Wikipedia article, hosted by Wikimedia. Every one is listed in
+  `src/features/destinations/catalog.ts` with its author and licence (CC0, CC BY or CC BY-SA),
+  and is credited next to the photo with a link to its file page. To add a destination, add a
+  line there with the photo's author and licence — never a photo without them.
+- **Any other destination** gets its Wikipedia lead image at run time (`src/services/wiki.ts`),
+  credited the same way. If there is no photo, the card falls back to the flag.
+- **Illustrations** (`src/components/Scene.tsx`) are original SVGs drawn for Voyara in the app's
+  own palette, so they follow light and dark themes.
+
 Fonts: Fraunces, Plus Jakarta Sans and Noto Sans (SIL Open Font License), self-hosted via
 Fontsource so they work offline. Icons: Lucide (ISC).
 

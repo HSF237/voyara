@@ -1,37 +1,14 @@
-import { motion, useReducedMotion, useScroll, useTransform, type Variants } from 'framer-motion';
-import { Hand } from 'lucide-react';
-import { Fragment, lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { motion, type Variants } from 'framer-motion';
+import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { paths } from '@/app/paths';
-import { useResolvedTheme } from '@/app/useResolvedTheme';
+import { HeroBanner } from '@/components/HeroBanner';
 import { TripBar } from '@/components/TripBar';
-import { Badge } from '@/components/ui';
 import { cn } from '@/lib/cn';
-import { onIdle } from '@/lib/onIdle';
 import { flagEmoji, type Place } from '@/services/geocoding';
 import { useTripDraft } from '@/store/tripDraft';
 import { POPULAR } from './cities';
-import { GlobeFallback } from './globe/GlobeFallback';
-
-// three.js is large: it is fetched after the page is interactive, never before.
-const Globe = lazy(() => import('./globe/Globe'));
-
-/** WebGL available, and the device isn't asking us to go easy on it. */
-function canRender3D(): boolean {
-  try {
-    const nav = navigator as Navigator & {
-      deviceMemory?: number;
-      connection?: { saveData?: boolean };
-    };
-    if (nav.connection?.saveData) return false;
-    if ((nav.deviceMemory ?? 8) <= 1 || (nav.hardwareConcurrency ?? 8) <= 2) return false;
-    const canvas = document.createElement('canvas');
-    return Boolean(canvas.getContext('webgl2') ?? canvas.getContext('webgl'));
-  } catch {
-    return false;
-  }
-}
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -73,93 +50,59 @@ function Words({ text }: { text: string }) {
   );
 }
 
+/** The landing hero: a travel photo, the promise, and the trip search card over its lower edge. */
 export function Hero() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const reduced = useReducedMotion() ?? false;
-  const theme = useResolvedTheme();
-  const root = useRef<HTMLElement>(null);
-  const [show3D, setShow3D] = useState(false);
-
   const selected = useTripDraft((state) => state.destination);
   const setDestination = useTripDraft((state) => state.setDestination);
 
-  // Wait for the browser to go idle before downloading and starting the globe.
-  useEffect(() => {
-    if (!canRender3D()) return;
-    return onIdle(() => setShow3D(true), 1500);
-  }, []);
-
-  // The globe sinks back slightly as the story below scrolls in.
-  const { scrollYProgress } = useScroll({ target: root, offset: ['start start', 'end start'] });
-  const globeY = useTransform(scrollYProgress, [0, 1], ['0%', '10%']);
-  const globeScale = useTransform(scrollYProgress, [0, 1], [1, 0.92]);
-
   return (
-    <section ref={root} className="relative overflow-x-clip">
-      <div className="container-page grid items-center gap-4 pt-10 pb-6 lg:min-h-[calc(100dvh-4rem)] lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:py-8">
-        <motion.div variants={stage} initial="hidden" animate="show" className="relative z-10">
-          <motion.div variants={fadeUp}>
-            <Badge tone="success">{t('home.eyebrow')}</Badge>
-          </motion.div>
-          <h1 className="mt-5 font-display text-2xl font-normal tracking-tight text-ink sm:text-3xl xl:text-4xl">
+    <motion.section variants={stage} initial="hidden" animate="show" className="relative">
+      <HeroBanner className="min-h-[34rem] sm:min-h-[36rem]">
+        <div className="container-page pt-14 pb-56 text-center text-white sm:pt-20 sm:pb-52">
+          <motion.p
+            variants={fadeUp}
+            className="inline-flex h-7 items-center rounded-full bg-white/20 px-3 text-xs font-semibold tracking-wide uppercase backdrop-blur-sm"
+          >
+            {t('home.eyebrow')}
+          </motion.p>
+          <h1 className="mx-auto mt-5 max-w-4xl font-display text-2xl font-normal tracking-tight drop-shadow-sm sm:text-3xl lg:text-4xl">
             <Words text={t('home.titleLead')} />{' '}
-            <em className="text-primary-ink">
+            <em>
               <Words text={t('home.titleEmphasis')} />
             </em>
           </h1>
-          <motion.p variants={slideUp} className="mt-5 max-w-xl text-lg text-muted">
+          <motion.p variants={slideUp} className="mx-auto mt-4 max-w-xl text-lg opacity-95">
             {t('home.body')}
           </motion.p>
+        </div>
+      </HeroBanner>
 
-          <motion.div variants={fadeUp} className="mt-8 max-w-xl">
-            <TripBar stacked onSubmit={() => void navigate(paths.setup)} />
+      <motion.div variants={fadeUp} className="relative z-20 container-page -mt-48 sm:-mt-44">
+        <TripBar onSubmit={() => void navigate(paths.setup)} className="mx-auto max-w-4xl" />
 
-            <motion.div layout className="mt-4 flex flex-wrap items-center gap-2">
-              <span className="me-1 text-sm text-muted">{t('home.popular')}</span>
-              {POPULAR.map((place: Place) => (
-                <button
-                  key={place.id}
-                  type="button"
-                  aria-pressed={selected?.id === place.id}
-                  onClick={() => setDestination(place)}
-                  className={cn(
-                    'inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-sm font-medium transition-colors',
-                    selected?.id === place.id
-                      ? 'border-primary bg-primary-soft text-primary-ink'
-                      : 'border-line-strong bg-surface text-ink hover:bg-surface-2',
-                  )}
-                >
-                  <span aria-hidden="true">{flagEmoji(place.countryCode)}</span>
-                  {place.name}
-                </button>
-              ))}
-            </motion.div>
-          </motion.div>
-        </motion.div>
-
-        <motion.div
-          style={reduced ? undefined : { y: globeY, scale: globeScale }}
-          className="relative mx-auto -mb-10 aspect-square w-full max-w-[26rem] sm:max-w-[34rem] lg:mb-0 lg:max-w-none"
-        >
-          {show3D ? (
-            <Suspense fallback={<GlobeFallback />}>
-              <Globe focus={selected} theme={theme} reduced={reduced} />
-            </Suspense>
-          ) : (
-            <GlobeFallback />
-          )}
-          {show3D && (
-            <p
-              className="pointer-events-none absolute inset-x-0 bottom-[6%] flex items-center justify-center gap-1.5 text-xs text-muted"
-              aria-hidden="true"
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+          <span className="me-1 text-sm text-muted">{t('home.popular')}</span>
+          {POPULAR.map((place: Place) => (
+            <button
+              key={place.id}
+              type="button"
+              aria-pressed={selected?.id === place.id}
+              onClick={() => setDestination(place)}
+              className={cn(
+                'inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-sm font-medium transition-colors',
+                selected?.id === place.id
+                  ? 'border-primary bg-primary-soft text-primary-ink'
+                  : 'border-line-strong bg-surface text-ink hover:bg-surface-2',
+              )}
             >
-              <Hand className="size-3.5" />
-              {t('home.dragHint')}
-            </p>
-          )}
-        </motion.div>
-      </div>
-    </section>
+              <span aria-hidden="true">{flagEmoji(place.countryCode)}</span>
+              {place.name}
+            </button>
+          ))}
+        </div>
+      </motion.div>
+    </motion.section>
   );
 }

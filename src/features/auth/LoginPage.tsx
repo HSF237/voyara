@@ -7,7 +7,9 @@ import { LanguageSelect, ThemeToggle } from '@/app/layout/controls';
 import { LogoMark } from '@/app/layout/Logo';
 import { paths, safeNext } from '@/app/paths';
 import { usePageTitle } from '@/app/usePageTitle';
+import { PhotoCredit } from '@/components/PhotoCredit';
 import { Button, toast } from '@/components/ui';
+import { DESTINATIONS, photoAt } from '@/features/destinations/catalog';
 import { cn } from '@/lib/cn';
 import { authProblem, signInWithGoogle } from '@/services/firebase';
 import { GUEST_EMOJIS, makeGuest, useAuth } from '@/store/auth';
@@ -20,6 +22,8 @@ const rise: Variants = {
   hidden: { opacity: 0, y: 16 },
   show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
 };
+
+const panelPhoto = DESTINATIONS.find((item) => item.id === 'cur:munnar');
 
 /** Sign in with Google, or start straight away as a guest with a name and avatar. */
 export function LoginPage() {
@@ -63,14 +67,19 @@ export function LoginPage() {
   return (
     <div className="grid min-h-dvh bg-bg text-ink lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
       {/* Brand panel */}
-      <div className="relative hidden overflow-hidden bg-primary p-12 text-on-primary lg:flex lg:flex-col">
-        <div aria-hidden="true">
-          <div className="absolute -end-40 -bottom-40 size-[34rem] rounded-full border border-on-primary/15" />
-          <div className="absolute -end-24 -bottom-24 size-[26rem] rounded-full border border-on-primary/15" />
-          <div className="absolute -end-8 -bottom-8 size-[18rem] rounded-full bg-on-primary/10" />
-        </div>
+      <div className="relative hidden overflow-hidden bg-primary p-12 text-white lg:flex lg:flex-col">
+        {panelPhoto && (
+          <>
+            <img
+              src={photoAt(panelPhoto.photo, 1280)}
+              alt=""
+              className="absolute inset-0 size-full object-cover"
+            />
+            <div className="absolute inset-0 bg-linear-to-t from-black/75 via-black/30 to-black/35" />
+          </>
+        )}
         <Link to={paths.home} className="relative flex items-center gap-2.5 self-start rounded-md">
-          <LogoMark className="ring-1 ring-on-primary/30" />
+          <LogoMark className="ring-1 ring-white/40" />
           <span className="font-display text-xl font-medium tracking-tight" translate="no">
             {t('app.name')}
           </span>
@@ -90,7 +99,7 @@ export function LoginPage() {
           <ul className="mt-8 space-y-3">
             {(['one', 'two', 'three'] as const).map((key) => (
               <motion.li key={key} variants={rise} className="flex items-center gap-3 text-base">
-                <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-on-primary/15">
+                <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-white/20">
                   <Check className="size-3.5" strokeWidth={3} aria-hidden="true" />
                 </span>
                 {t(`auth.points.${key}`)}
@@ -98,6 +107,9 @@ export function LoginPage() {
             ))}
           </ul>
         </motion.div>
+        {panelPhoto && (
+          <PhotoCredit photo={panelPhoto.photo} className="relative mt-6 text-white/70" />
+        )}
       </div>
 
       {/* Sign-in panel */}

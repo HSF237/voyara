@@ -257,7 +257,8 @@
     "seeAll": "Lihat semua",
     "ideas": "Idea untuk perjalanan seterusnya",
     "planHere": "Rancang perjalanan di sini",
-    "whereNext": "Ke mana seterusnya?"
+    "whereNext": "Ke mana seterusnya?",
+    "byInterest": "Rancang ikut minat"
   },
   "trips": {
     "title": "Perjalanan saya",
@@ -267,9 +268,24 @@
     "emptyPast": "Perjalanan lepas akan terkumpul di sini."
   },
   "bar": {
-    "done": "Selesai"
+    "done": "Selesai",
+    "start": "Mula",
+    "end": "Tamat"
   },
   "photo": {
     "by": "Foto: {{credit}}"
+  },
+  "party": {
+    "solo": "Solo",
+    "couple": "Berdua",
+    "family": "Keluarga",
+    "friends": "Rakan-rakan"
+  },
+  "themes": {
+    "all": "Semua",
+    "city": "Bandar",
+    "beach": "Pantai",
+    "hills": "Bukit",
+    "heritage": "Warisan"
   }
 }

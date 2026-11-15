@@ -257,7 +257,8 @@
     "seeAll": "See all",
     "ideas": "Ideas for your next trip",
     "planHere": "Plan a trip here",
-    "whereNext": "Where next?"
+    "whereNext": "Where next?",
+    "byInterest": "Plan by interest"
   },
   "trips": {
     "title": "My trips",
@@ -267,9 +268,24 @@
     "emptyPast": "Past trips will collect here."
   },
   "bar": {
-    "done": "Done"
+    "done": "Done",
+    "start": "Start",
+    "end": "End"
   },
   "photo": {
     "by": "Photo: {{credit}}"
+  },
+  "party": {
+    "solo": "Solo",
+    "couple": "Couple",
+    "family": "Family",
+    "friends": "Friends"
+  },
+  "themes": {
+    "all": "All",
+    "city": "Cities",
+    "beach": "Coast",
+    "hills": "Hills",
+    "heritage": "Heritage"
   }
 }

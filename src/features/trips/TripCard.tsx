@@ -1,8 +1,11 @@
 import { motion } from 'framer-motion';
 import { Moon, UsersRound } from 'lucide-react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { planPath } from '@/app/paths';
+import { photoAt } from '@/features/destinations/catalog';
+import { useDestinationPhoto } from '@/features/destinations/useDestinationPhoto';
 import type { Trip } from '@/features/trip/model';
 import { cn } from '@/lib/cn';
 import { formatDateRange, nightsBetween } from '@/lib/dates';
@@ -25,6 +28,9 @@ function bandFor(code: string): string {
 export function TripCard({ trip, className }: { trip: Trip; className?: string }) {
   const { t, i18n } = useTranslation();
   const nights = nightsBetween(trip.startDate, trip.endDate);
+  const photo = useDestinationPhoto(trip.destination);
+  const [failed, setFailed] = useState(false);
+  const showPhoto = Boolean(photo) && !failed;
 
   return (
     <motion.div
@@ -38,14 +44,32 @@ export function TripCard({ trip, className }: { trip: Trip; className?: string }
       >
         <div
           className={cn(
-            'flex h-24 items-end justify-between px-5 pb-3',
+            'relative flex h-36 items-end justify-between overflow-hidden px-5 pb-3',
             bandFor(trip.destination.countryCode),
           )}
         >
-          <span className="text-4xl leading-none" aria-hidden="true">
+          {showPhoto && photo && (
+            <>
+              <img
+                src={photoAt(photo, 500)}
+                alt=""
+                loading="lazy"
+                onError={() => setFailed(true)}
+                className="absolute inset-0 size-full object-cover"
+              />
+              <span className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
+            </>
+          )}
+          <span className="relative text-4xl leading-none" aria-hidden="true">
             {flagEmoji(trip.destination.countryCode)}
           </span>
-          <span className="font-mono text-xs tracking-wider opacity-80" dir="ltr">
+          <span
+            className={cn(
+              'relative font-mono text-xs tracking-wider',
+              showPhoto ? 'text-white' : 'opacity-80',
+            )}
+            dir="ltr"
+          >
             {trip.code}
           </span>
         </div>

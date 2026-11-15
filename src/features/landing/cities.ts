@@ -48,7 +48,3 @@ export const ROUTES: [Place, Place][] = [
   [CITIES.paris, CITIES.cairo],
   [CITIES.cairo, CITIES.capeTown],
 ];
-
-/** Wikipedia article for each city, where it differs from the city's name. */
-const WIKI_TITLES: Record<string, string> = { 'cur:new-york': 'New York City' };
-export const wikiTitle = (place: Place): string => WIKI_TITLES[place.id] ?? place.name;

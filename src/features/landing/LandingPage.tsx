@@ -4,11 +4,14 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { paths } from '@/app/paths';
 import { usePageTitle } from '@/app/usePageTitle';
-import { DestinationRail } from '@/features/destinations/DestinationRail';
+import { buttonStyles } from '@/components/ui/button.styles';
+import { InterestTiles } from '@/features/destinations/InterestTiles';
+import { TopDestinations } from '@/features/destinations/TopDestinations';
+import { cn } from '@/lib/cn';
 import { onIdle } from '@/lib/onIdle';
 import { useNow } from '@/lib/useNow';
 import { useTripDraft } from '@/store/tripDraft';
-import { CITIES } from './cities';
+import { GlobeStage } from './GlobeStage';
 import { Hero } from './Hero';
 
 const StorySection = lazy(() => import('./StorySection'));
@@ -18,7 +21,7 @@ export function LandingPage() {
   usePageTitle();
   const navigate = useNavigate();
   const now = useNow();
-  const setDestination = useTripDraft((state) => state.setDestination);
+  const draft = useTripDraft();
   const sentinel = useRef<HTMLDivElement>(null);
   const [showStory, setShowStory] = useState(false);
 
@@ -44,25 +47,23 @@ export function LandingPage() {
   return (
     <>
       <Hero />
-      <section
-        aria-labelledby="popular-title"
-        className="relative z-0 container-page pt-14 sm:pt-20"
-      >
-        <h2 id="popular-title" className="font-display text-2xl font-medium tracking-tight">
-          {t('home.popularTitle')}
-        </h2>
-        <div className="mt-5">
-          <DestinationRail
-            places={Object.values(CITIES)}
-            onPick={(place) => {
-              setDestination(place);
-              void navigate(paths.setup);
-            }}
-            now={now}
-            label={t('home.popularTitle')}
-          />
-        </div>
-      </section>
+      <div className="relative z-0 container-page space-y-14 pt-14 sm:pt-16">
+        <TopDestinations
+          title={t('home.popularTitle')}
+          now={now}
+          onPick={(place) => {
+            draft.setDestination(place);
+            void navigate(paths.setup);
+          }}
+        />
+        <InterestTiles
+          title={t('dash.byInterest')}
+          onPick={(interest) => {
+            if (!draft.interests.includes(interest)) draft.toggleInterest(interest);
+            void navigate(paths.setup);
+          }}
+        />
+      </div>
       <div ref={sentinel} />
       {showStory ? (
         <Suspense fallback={<div className="min-h-[40rem]" />}>
@@ -72,18 +73,20 @@ export function LandingPage() {
         <div className="min-h-[40rem]" />
       )}
       <section className="container-page pb-20 sm:pb-28">
-        <div className="relative overflow-hidden rounded-xl bg-primary px-6 py-12 text-center text-on-primary sm:px-12 sm:py-16">
-          <h2 className="font-display text-2xl font-medium tracking-tight sm:text-3xl">
-            {t('home.final.title')}
-          </h2>
-          <p className="mx-auto mt-3 max-w-md text-lg opacity-90">{t('home.final.body')}</p>
-          <Link
-            to={paths.setup}
-            className="mt-8 inline-flex min-h-13 items-center gap-2 rounded-full bg-surface px-7 text-base font-semibold text-ink shadow-md transition-transform hover:-translate-y-0.5 focus-visible:outline-on-primary"
-          >
-            {t('nav.plan')}
-            <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" />
-          </Link>
+        <div className="grid items-center gap-6 overflow-hidden rounded-xl border border-line bg-surface px-6 py-10 shadow-sm sm:px-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)]">
+          <div className="text-center lg:text-start">
+            <h2 className="font-display text-2xl font-medium tracking-tight sm:text-3xl">
+              {t('home.final.title')}
+            </h2>
+            <p className="mx-auto mt-3 max-w-md text-lg text-muted lg:mx-0">
+              {t('home.final.body')}
+            </p>
+            <Link to={paths.setup} className={cn(buttonStyles({ size: 'lg' }), 'mt-8')}>
+              {t('nav.plan')}
+              <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" />
+            </Link>
+          </div>
+          <GlobeStage focus={draft.destination} className="mx-auto max-w-[22rem] lg:max-w-none" />
         </div>
       </section>
     </>

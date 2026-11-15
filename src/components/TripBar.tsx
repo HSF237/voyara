@@ -1,82 +1,70 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, CalendarRange, UsersRound } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import {
+  ArrowRight,
+  Baby,
+  CalendarDays,
+  ChevronDown,
+  Heart,
+  UserRound,
+  UsersRound,
+  type LucideIcon,
+} from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui';
 import { CrewPicker } from '@/features/setup/CrewPicker';
 import { DateRangeCalendar } from '@/features/setup/DateRangeCalendar';
 import { MAX_NIGHTS } from '@/features/trip/model';
 import { cn } from '@/lib/cn';
-import { formatDateRange, nightsBetween, startOfToday } from '@/lib/dates';
+import { formatDay, nightsBetween, startOfToday } from '@/lib/dates';
 import { useTripDraft } from '@/store/tripDraft';
 import { DestinationSearch } from './DestinationSearch';
 
 type Panel = 'dates' | 'people';
 
+const parties: { key: 'solo' | 'couple' | 'family' | 'friends'; size: number; icon: LucideIcon }[] =
+  [
+    { key: 'solo', size: 1, icon: UserRound },
+    { key: 'couple', size: 2, icon: Heart },
+    { key: 'family', size: 4, icon: Baby },
+    { key: 'friends', size: 6, icon: UsersRound },
+  ];
+
 type TripBarProps = {
-  /** Called with a destination chosen. Usually navigates to trip setup. */
+  /** Called once a destination is chosen. Usually opens trip setup. */
   onSubmit: () => void;
-  /** Two rows instead of one: for narrow columns such as the landing hero. */
-  stacked?: boolean;
   className?: string;
 };
 
-function Segment({
-  icon,
-  label,
-  value,
-  open,
-  onClick,
-}: {
-  icon: ReactNode;
-  label: string;
-  value: ReactNode;
-  open: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      aria-haspopup="dialog"
-      aria-expanded={open}
-      onClick={onClick}
-      className={cn(
-        'flex h-14 w-full min-w-0 items-center gap-3 rounded-md px-3.5 text-start transition-colors',
-        open ? 'bg-primary-soft' : 'hover:bg-surface-2',
-      )}
-    >
-      <span className="text-muted [&>svg]:size-4.5" aria-hidden="true">
-        {icon}
-      </span>
-      <span className="min-w-0">
-        <span className="block text-xs text-muted">{label}</span>
-        <span className="block truncate text-sm font-semibold text-ink tabular-nums">{value}</span>
-      </span>
-    </button>
-  );
-}
-
 /**
- * The whole trip in one bar: where, when, who, go. It edits the same draft as
- * the full setup screen, so "Plan it" carries everything across.
+ * The trip search card: who's going (tabs), where, when, how many — and one
+ * big button. It edits the same draft as the full setup screen, so "Plan it"
+ * carries everything across.
  */
-export function TripBar({ onSubmit, stacked = false, className }: TripBarProps) {
+export function TripBar({ onSubmit, className }: TripBarProps) {
   const { t, i18n } = useTranslation();
+  const language = i18n.language;
   const root = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const [panel, setPanel] = useState<Panel | null>(null);
   const [nudged, setNudged] = useState(false);
   const today = useMemo(() => startOfToday(), []);
 
-  const destination = useTripDraft((state) => state.destination);
-  const startDate = useTripDraft((state) => state.startDate);
-  const endDate = useTripDraft((state) => state.endDate);
-  const travellers = useTripDraft((state) => state.travellers);
-  const setDestination = useTripDraft((state) => state.setDestination);
-  const setDates = useTripDraft((state) => state.setDates);
-  const setTravellers = useTripDraft((state) => state.setTravellers);
+  const draft = useTripDraft();
+  const { destination, startDate, endDate, travellers, interests } = draft;
+  const familyTrip = interests.includes('family');
+  const activeParty =
+    travellers === 1
+      ? 'solo'
+      : travellers === 2
+        ? 'couple'
+        : travellers === 4 && familyTrip
+          ? 'family'
+          : travellers === 6
+            ? 'friends'
+            : null;
 
-  // An open panel closes on Escape or a click anywhere outside the bar.
+  // An open panel closes on Escape or a click anywhere outside the card.
   useEffect(() => {
     if (!panel) return;
     const onPointerDown = (event: PointerEvent) => {
@@ -93,6 +81,11 @@ export function TripBar({ onSubmit, stacked = false, className }: TripBarProps) 
     };
   }, [panel]);
 
+  function chooseParty(key: (typeof parties)[number]['key'], size: number) {
+    draft.setTravellers(size);
+    if ((key === 'family') !== familyTrip) draft.toggleInterest('family');
+  }
+
   function submit() {
     setPanel(null);
     if (!destination) {
@@ -104,50 +97,131 @@ export function TripBar({ onSubmit, stacked = false, className }: TripBarProps) 
   }
 
   const toggle = (next: Panel) => setPanel((current) => (current === next ? null : next));
+  const dateTile = (label: string, date: string) => (
+    <span className="block min-w-0 px-3 py-2.5 text-start sm:px-4">
+      <span className="block text-xs text-muted">{label}</span>
+      <span className="block truncate text-base font-semibold text-ink tabular-nums">
+        {formatDay(date, language, { day: 'numeric', month: 'short', year: 'numeric' })}
+      </span>
+      <span className="block truncate text-xs text-muted">
+        {formatDay(date, language, { weekday: 'long' })}
+      </span>
+    </span>
+  );
 
   return (
-    <div ref={root} className={cn('relative', className)}>
+    <div ref={root} className={cn('relative pt-6 pb-7', className)}>
+      {/* Who's going: tabs that sit on the card's top edge */}
+      <div className="absolute inset-x-0 top-0 z-10 flex justify-center px-3">
+        <div
+          role="group"
+          aria-label={t('setup.who')}
+          className="flex max-w-full [scrollbar-width:none] gap-1 overflow-x-auto rounded-full border border-line bg-surface p-1 shadow-md"
+        >
+          {parties.map(({ key, size, icon: Icon }) => {
+            const active = activeParty === key;
+            return (
+              <button
+                key={key}
+                type="button"
+                aria-pressed={active}
+                onClick={() => chooseParty(key, size)}
+                className={cn(
+                  'relative flex h-10 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-xs font-semibold transition-colors sm:px-3.5 sm:text-sm',
+                  active ? 'text-on-primary' : 'text-muted hover:text-ink',
+                )}
+              >
+                {active && (
+                  <motion.span
+                    layoutId="party-active"
+                    className="absolute inset-0 rounded-full bg-primary"
+                    transition={{ type: 'spring', stiffness: 480, damping: 36 }}
+                  />
+                )}
+                <Icon className="relative hidden size-4 min-[26rem]:block" aria-hidden="true" />
+                <span className="relative">{t(`party.${key}`)}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       <motion.div
         animate={nudged && !destination ? { x: [0, -8, 8, -5, 5, 0] } : { x: 0 }}
         transition={{ duration: 0.4 }}
         onAnimationComplete={() => setNudged(false)}
-        className={cn(
-          'grid gap-1 rounded-xl border border-line bg-surface p-1.5 shadow-md',
-          stacked
-            ? 'grid-cols-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)_auto]'
-            : 'grid-cols-2 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1.1fr)_minmax(0,0.8fr)_auto]',
-        )}
+        className="rounded-[1.75rem] border border-line bg-surface px-4 pt-11 pb-12 shadow-lg sm:px-6"
       >
-        <DestinationSearch
-          ref={searchRef}
-          bare
-          value={destination}
-          onSelect={setDestination}
-          className={cn('col-span-2', stacked ? 'sm:col-span-3' : 'lg:col-span-1')}
-        />
-        <Segment
-          icon={<CalendarRange />}
-          label={`${t('ticket.dates')} · ${t('ticket.nights')}: ${nightsBetween(startDate, endDate)}`}
-          value={formatDateRange(startDate, endDate, i18n.language)}
-          open={panel === 'dates'}
-          onClick={() => toggle('dates')}
-        />
-        <Segment
-          icon={<UsersRound />}
-          label={t('ticket.travellers')}
-          value={travellers}
-          open={panel === 'people'}
-          onClick={() => toggle('people')}
-        />
+        <div className="rounded-lg border border-line-strong">
+          <DestinationSearch
+            ref={searchRef}
+            bare
+            value={destination}
+            onSelect={draft.setDestination}
+          />
+        </div>
+        <div className="mt-3 grid gap-3 sm:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+          <button
+            type="button"
+            aria-haspopup="dialog"
+            aria-expanded={panel === 'dates'}
+            aria-label={`${t('ticket.dates')}: ${formatDay(startDate, language, { dateStyle: 'medium' })} – ${formatDay(endDate, language, { dateStyle: 'medium' })}`}
+            onClick={() => toggle('dates')}
+            className={cn(
+              'grid grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)] items-center rounded-lg border transition-colors',
+              panel === 'dates'
+                ? 'border-primary bg-primary-soft'
+                : 'border-line-strong hover:bg-surface-2',
+            )}
+          >
+            <CalendarDays className="ms-4 size-5 text-muted" aria-hidden="true" />
+            {dateTile(t('bar.start'), startDate)}
+            <span className="border-s border-line">{dateTile(t('bar.end'), endDate)}</span>
+          </button>
+          <button
+            type="button"
+            aria-haspopup="dialog"
+            aria-expanded={panel === 'people'}
+            onClick={() => toggle('people')}
+            className={cn(
+              'flex items-center gap-3 rounded-lg border px-4 py-2.5 text-start transition-colors',
+              panel === 'people'
+                ? 'border-primary bg-primary-soft'
+                : 'border-line-strong hover:bg-surface-2',
+            )}
+          >
+            <UsersRound className="size-5 shrink-0 text-muted" aria-hidden="true" />
+            <span className="min-w-0 flex-1">
+              <span className="block text-xs text-muted">{t('ticket.travellers')}</span>
+              <span className="block text-base font-semibold text-ink tabular-nums">
+                {travellers}
+              </span>
+              <span className="block truncate text-xs text-muted">
+                {t('ticket.nights')}: {nightsBetween(startDate, endDate)}
+              </span>
+            </span>
+            <ChevronDown
+              className={cn(
+                'size-4 shrink-0 text-muted transition-transform',
+                panel === 'people' && 'rotate-180',
+              )}
+              aria-hidden="true"
+            />
+          </button>
+        </div>
+      </motion.div>
+
+      {/* The main action overlaps the card's bottom edge */}
+      <div className="absolute inset-x-0 bottom-0 flex justify-center px-6">
         <Button
           size="lg"
           onClick={submit}
-          className={cn('col-span-2 rounded-lg', stacked ? 'sm:col-span-1' : 'lg:col-span-1')}
-          iconEnd={<ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" />}
+          className="h-14 w-full max-w-sm text-base tracking-wide uppercase shadow-lg"
+          iconEnd={<ArrowRight className="size-5 rtl:rotate-180" aria-hidden="true" />}
         >
           {t('setup.planIt')}
         </Button>
-      </motion.div>
+      </div>
 
       <AnimatePresence>
         {panel && (
@@ -160,7 +234,7 @@ export function TripBar({ onSubmit, stacked = false, className }: TripBarProps) 
             exit={{ opacity: 0, y: -6, transition: { duration: 0.12 } }}
             transition={{ type: 'spring', stiffness: 460, damping: 34 }}
             className={cn(
-              'absolute top-full z-30 mt-2 origin-top rounded-xl border border-line bg-surface p-4 text-start shadow-lg sm:p-5',
+              'absolute top-[calc(100%-1.25rem)] z-30 origin-top rounded-xl border border-line bg-surface p-4 text-start shadow-lg sm:p-5',
               panel === 'dates' ? 'inset-x-0 mx-auto max-w-2xl' : 'end-0 w-full max-w-sm',
             )}
           >
@@ -168,12 +242,12 @@ export function TripBar({ onSubmit, stacked = false, className }: TripBarProps) 
               <DateRangeCalendar
                 startDate={startDate}
                 endDate={endDate}
-                onChange={setDates}
+                onChange={draft.setDates}
                 minDate={today}
                 maxNights={MAX_NIGHTS}
               />
             ) : (
-              <CrewPicker value={travellers} onChange={setTravellers} />
+              <CrewPicker value={travellers} onChange={draft.setTravellers} />
             )}
             <div className="mt-4 flex justify-end">
               <Button size="sm" variant="secondary" onClick={() => setPanel(null)}>

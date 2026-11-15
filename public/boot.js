@@ -3,8 +3,11 @@
 (function () {
   try {
     var raw = localStorage.getItem('voyara.settings');
-    var s = raw ? JSON.parse(raw).state || {} : {};
-    var theme = s.theme || 'system';
+    var saved = raw ? JSON.parse(raw) : {};
+    var s = saved.state || {};
+    // Light is the default. Before settings v2, "system" was only ever a default.
+    var theme = s.theme || 'light';
+    if (theme === 'system' && (saved.version || 0) < 2) theme = 'light';
     var dark =
       theme === 'dark' ||
       (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);

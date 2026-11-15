@@ -6,25 +6,29 @@ import { Link, useNavigate } from 'react-router-dom';
 import { paths, planPath } from '@/app/paths';
 import { usePageTitle } from '@/app/usePageTitle';
 import { AnimatedNumber } from '@/components/AnimatedNumber';
+import { HeroBanner } from '@/components/HeroBanner';
+import { PhotoCredit } from '@/components/PhotoCredit';
+import { Scene } from '@/components/Scene';
 import { TripBar } from '@/components/TripBar';
 import { Card } from '@/components/ui';
-import { DestinationRail, PhotoCredit } from '@/features/destinations/DestinationRail';
-import { CITIES } from '@/features/landing/cities';
+import { photoAt } from '@/features/destinations/catalog';
+import { InterestTiles } from '@/features/destinations/InterestTiles';
+import { TopDestinations } from '@/features/destinations/TopDestinations';
+import { useDestinationPhoto } from '@/features/destinations/useDestinationPhoto';
 import { DayStrip } from '@/features/setup/DayStrip';
-import type { Trip } from '@/features/trip/model';
+import type { Interest, Trip } from '@/features/trip/model';
 import { useTripForecast } from '@/features/trip/useTripForecast';
 import { TripCard } from '@/features/trips/TripCard';
 import { cn } from '@/lib/cn';
 import { formatDateRange, startOfToday, toISODate } from '@/lib/dates';
 import { useNow } from '@/lib/useNow';
 import { flagEmoji, type Place } from '@/services/geocoding';
-import { usePlacePhoto } from '@/services/queries';
 import { firstName, useAuth } from '@/store/auth';
 import { useTripDraft } from '@/store/tripDraft';
 import { useTrips } from '@/store/trips';
 import { dayPart, daysUntil, tripStats, upcomingTrips } from './model';
 
-const list: Variants = { hidden: {}, show: { transition: { staggerChildren: 0.06 } } };
+const list: Variants = { hidden: {}, show: { transition: { staggerChildren: 0.07 } } };
 const rise: Variants = {
   hidden: { opacity: 0, y: 18 },
   show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
@@ -33,7 +37,7 @@ const rise: Variants = {
 function NextTrip({ trip, today }: { trip: Trip; today: string }) {
   const { t, i18n } = useTranslation();
   const forecast = useTripForecast(trip.destination, trip.startDate, trip.endDate);
-  const photo = usePlacePhoto(trip.destination).data;
+  const photo = useDestinationPhoto(trip.destination);
   const [photoFailed, setPhotoFailed] = useState(false);
   const withPhoto = Boolean(photo) && !photoFailed;
   const days = daysUntil(trip, today);
@@ -49,22 +53,17 @@ function NextTrip({ trip, today }: { trip: Trip; today: string }) {
       {withPhoto && photo && (
         <>
           <img
-            src={photo.url}
+            src={photoAt(photo, 960)}
             alt=""
             onError={() => setPhotoFailed(true)}
             className="absolute inset-0 size-full object-cover"
           />
-          <div className="absolute inset-0 bg-black/55" />
+          <div className="absolute inset-0 bg-linear-to-r from-black/70 via-black/45 to-black/25" />
         </>
       )}
-      <div aria-hidden="true" className={withPhoto ? 'hidden' : undefined}>
-        <div className="absolute -end-28 -top-28 size-80 rounded-full border border-on-primary/15" />
-        <div className="absolute -end-16 -top-16 size-56 rounded-full border border-on-primary/15" />
-        <div className="absolute -end-4 -top-4 size-32 rounded-full bg-on-primary/10" />
-      </div>
       <div className="relative flex flex-wrap items-end justify-between gap-6">
         <div className="min-w-0">
-          <span className="inline-flex h-6 items-center rounded-full bg-on-primary/15 px-2.5 text-xs font-semibold">
+          <span className="inline-flex h-6 items-center rounded-full bg-white/20 px-2.5 text-xs font-semibold backdrop-blur-sm">
             {underWay ? t('dash.now') : t('dash.nextTrip')}
           </span>
           <h2 className="mt-4 font-display text-3xl leading-tight font-medium tracking-tight">
@@ -98,16 +97,16 @@ function NextTrip({ trip, today }: { trip: Trip; today: string }) {
         )}
       </div>
 
-      <Link
-        to={planPath(trip.id)}
-        className="relative mt-6 inline-flex min-h-11 items-center gap-2 rounded-full bg-surface px-5 text-sm font-semibold text-ink shadow-sm transition-transform hover:-translate-y-0.5 focus-visible:outline-on-primary"
-      >
-        {t('dash.openTrip')}
-        <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" />
-      </Link>
-      {withPhoto && photo && (
-        <PhotoCredit photo={photo} className="absolute end-4 bottom-3 max-w-[55%] text-white/75" />
-      )}
+      <div className="relative mt-6 flex flex-wrap items-center justify-between gap-3">
+        <Link
+          to={planPath(trip.id)}
+          className="inline-flex min-h-11 items-center gap-2 rounded-full bg-surface px-5 text-sm font-semibold text-ink shadow-sm transition-transform hover:-translate-y-0.5 focus-visible:outline-white"
+        >
+          {t('dash.openTrip')}
+          <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" />
+        </Link>
+        {withPhoto && photo && <PhotoCredit photo={photo} className="max-w-[55%] text-white/75" />}
+      </div>
     </div>
   );
 }
@@ -115,14 +114,14 @@ function NextTrip({ trip, today }: { trip: Trip; today: string }) {
 function FirstTrip() {
   const { t } = useTranslation();
   return (
-    <Card className="flex h-full flex-col justify-center p-6 sm:p-8">
-      <span className="flex size-12 items-center justify-center rounded-full bg-primary-soft text-primary-ink">
-        <Luggage className="size-6" aria-hidden="true" />
-      </span>
-      <h2 className="mt-5 font-display text-2xl font-medium tracking-tight">
-        {t('dash.emptyTitle')}
-      </h2>
-      <p className="mt-2 text-muted">{t('dash.emptyBody')}</p>
+    <Card flush className="grid h-full overflow-hidden sm:grid-cols-[minmax(0,1fr)_16rem]">
+      <div className="flex flex-col justify-center p-6 sm:p-8">
+        <h2 className="font-display text-2xl font-medium tracking-tight">{t('dash.emptyTitle')}</h2>
+        <p className="mt-2 text-muted">{t('dash.emptyBody')}</p>
+      </div>
+      <div className="h-40 sm:h-full">
+        <Scene name="journey" />
+      </div>
     </Card>
   );
 }
@@ -151,7 +150,7 @@ function StatTile({
   );
 }
 
-/** Home for a signed-in traveller: what's next, what's saved, and where to go. */
+/** Home for a signed-in traveller: a photo banner with the trip search on top, then everything else. */
 export function DashboardPage() {
   const { t, i18n } = useTranslation();
   usePageTitle(t('nav.home'));
@@ -159,7 +158,7 @@ export function DashboardPage() {
   const now = useNow();
   const user = useAuth((state) => state.user);
   const trips = useTrips((state) => state.trips);
-  const setDestination = useTripDraft((state) => state.setDestination);
+  const draft = useTripDraft();
 
   const today = useMemo(() => toISODate(startOfToday()), []);
   const upcoming = useMemo(() => upcomingTrips(trips, today), [trips, today]);
@@ -168,76 +167,77 @@ export function DashboardPage() {
   const others = (next ? trips.filter((trip) => trip.id !== next.id) : trips).slice(0, 3);
 
   function planFor(place: Place) {
-    setDestination(place);
+    draft.setDestination(place);
+    void navigate(paths.setup);
+  }
+
+  function planWith(interest: Interest) {
+    if (!draft.interests.includes(interest)) draft.toggleInterest(interest);
     void navigate(paths.setup);
   }
 
   return (
-    <motion.div
-      variants={list}
-      initial="hidden"
-      animate="show"
-      className="container-page py-6 sm:py-10"
-    >
-      <motion.header variants={rise}>
-        <p className="text-sm text-muted">
-          {new Intl.DateTimeFormat(i18n.language, { dateStyle: 'full' }).format(now)}
-        </p>
-        <h1 className="mt-1 font-display text-2xl font-medium tracking-tight sm:text-3xl">
-          {t(`dash.${dayPart(now.getHours())}`, { name: firstName(user) })}
-        </h1>
-      </motion.header>
+    <motion.div variants={list} initial="hidden" animate="show">
+      <HeroBanner className="h-88 sm:h-96 lg:rounded-b-[2rem]">
+        <motion.div
+          variants={rise}
+          className="container-page pt-12 text-center text-white sm:pt-14"
+        >
+          <p className="text-sm font-medium opacity-90">
+            {new Intl.DateTimeFormat(i18n.language, { dateStyle: 'full' }).format(now)}
+          </p>
+          <h1 className="mt-2 font-display text-2xl font-medium tracking-tight drop-shadow-sm sm:text-3xl">
+            {t(`dash.${dayPart(now.getHours())}`, { name: firstName(user) })}
+          </h1>
+          <p className="mt-2 text-lg opacity-95">{t('dash.whereNext')}</p>
+        </motion.div>
+      </HeroBanner>
 
-      <motion.div variants={rise} className="relative z-20 mt-6">
-        <h2 className="mb-2 text-sm font-semibold text-muted">{t('dash.whereNext')}</h2>
-        <TripBar onSubmit={() => void navigate(paths.setup)} />
+      <motion.div variants={rise} className="relative z-20 container-page -mt-36 sm:-mt-40">
+        <TripBar onSubmit={() => void navigate(paths.setup)} className="mx-auto max-w-4xl" />
       </motion.div>
 
-      <div className="mt-6 grid gap-4 xl:grid-cols-[minmax(0,1fr)_18rem]">
-        <motion.div variants={rise} className="min-w-0">
-          {next ? <NextTrip trip={next} today={today} /> : <FirstTrip />}
+      <div className="container-page space-y-14 pt-8 pb-10 sm:pt-10">
+        <motion.div variants={rise} className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_18rem]">
+          <div className="min-w-0">
+            {next ? <NextTrip trip={next} today={today} /> : <FirstTrip />}
+          </div>
+          <div className="grid min-w-0 gap-4 sm:grid-cols-3 xl:grid-cols-1">
+            <StatTile icon={Luggage} label={t('dash.stats.trips')} value={stats.trips} />
+            <StatTile icon={Earth} label={t('dash.stats.countries')} value={stats.countries} />
+            <StatTile icon={Moon} label={t('dash.stats.nights')} value={stats.nights} />
+          </div>
         </motion.div>
-        <motion.div variants={rise} className="grid min-w-0 gap-4 sm:grid-cols-3 xl:grid-cols-1">
-          <StatTile icon={Luggage} label={t('dash.stats.trips')} value={stats.trips} />
-          <StatTile icon={Earth} label={t('dash.stats.countries')} value={stats.countries} />
-          <StatTile icon={Moon} label={t('dash.stats.nights')} value={stats.nights} />
+
+        <motion.div variants={rise}>
+          <TopDestinations title={t('home.popularTitle')} onPick={planFor} now={now} />
         </motion.div>
+
+        <motion.div variants={rise}>
+          <InterestTiles title={t('dash.byInterest')} onPick={planWith} />
+        </motion.div>
+
+        {others.length > 0 && (
+          <motion.section variants={rise} aria-labelledby="dash-trips">
+            <div className="flex items-baseline justify-between gap-4">
+              <h2 id="dash-trips" className="font-display text-2xl font-medium tracking-tight">
+                {t('dash.yourTrips')}
+              </h2>
+              <Link
+                to={paths.trips}
+                className="rounded-sm text-sm font-semibold text-primary-ink underline-offset-4 hover:underline"
+              >
+                {t('dash.seeAll')}
+              </Link>
+            </div>
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {others.map((trip) => (
+                <TripCard key={trip.id} trip={trip} />
+              ))}
+            </div>
+          </motion.section>
+        )}
       </div>
-
-      {others.length > 0 && (
-        <motion.section variants={rise} aria-labelledby="dash-trips" className="mt-10">
-          <div className="flex items-baseline justify-between gap-4">
-            <h2 id="dash-trips" className="font-display text-xl font-medium">
-              {t('dash.yourTrips')}
-            </h2>
-            <Link
-              to={paths.trips}
-              className="rounded-sm text-sm font-semibold text-primary-ink underline-offset-4 hover:underline"
-            >
-              {t('dash.seeAll')}
-            </Link>
-          </div>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {others.map((trip) => (
-              <TripCard key={trip.id} trip={trip} />
-            ))}
-          </div>
-        </motion.section>
-      )}
-
-      <motion.section variants={rise} aria-labelledby="dash-ideas" className="mt-10">
-        <h2 id="dash-ideas" className="font-display text-xl font-medium">
-          {t('dash.ideas')}
-        </h2>
-        <div className="mt-4">
-          <DestinationRail
-            places={Object.values(CITIES)}
-            onPick={planFor}
-            now={now}
-            label={t('dash.ideas')}
-          />
-        </div>
-      </motion.section>
     </motion.div>
   );
 }

@@ -29,6 +29,19 @@ describe('first-visit defaults', () => {
   });
 });
 
+describe('theme default', () => {
+  it('starts in the light theme', () => {
+    expect(useSettings.getInitialState().theme).toBe('light');
+  });
+
+  it('moves a saved pre-v2 "system" choice to light, and keeps explicit choices', () => {
+    const migrate = useSettings.persist.getOptions().migrate!;
+    expect(migrate({ theme: 'system', language: 'en' }, 1)).toMatchObject({ theme: 'light' });
+    expect(migrate({ theme: 'dark', language: 'en' }, 1)).toMatchObject({ theme: 'dark' });
+    expect(migrate({ theme: 'system', language: 'en' }, 2)).toMatchObject({ theme: 'system' });
+  });
+});
+
 describe('theme', () => {
   it('resolves "system" from the OS preference', () => {
     expect(resolveTheme('system', true)).toBe('dark');

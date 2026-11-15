@@ -37,7 +37,7 @@ export function detectDefaults(): SettingsValues {
   const tags = typeof navigator === 'undefined' ? [] : (navigator.languages ?? []);
   const primary = tags[0];
   return {
-    theme: 'system',
+    theme: 'light',
     language: detectLanguage(tags),
     currency: detectCurrency(primary),
     units: detectUnits(primary),
@@ -69,7 +69,12 @@ export const useSettings = create<SettingsState>()(
     }),
     {
       name: SETTINGS_STORAGE_KEY,
-      version: 1,
+      version: 2,
+      // v2 made light the default: earlier visitors on "system" move to it once.
+      migrate: (persisted, version) => {
+        const saved = (persisted ?? {}) as Partial<SettingsValues>;
+        return version < 2 && saved.theme === 'system' ? { ...saved, theme: 'light' } : saved;
+      },
       partialize: ({ theme, language, currency, units }) => ({ theme, language, currency, units }),
       merge: (persisted, current) => ({ ...current, ...sanitize(persisted, current) }),
     },

@@ -81,7 +81,10 @@ type Page = z.infer<typeof pageSchema>;
 
 /** Look up author and licence for each page's lead image, in one request. */
 async function withCredits(pages: Page[], signal?: AbortSignal): Promise<Map<string, PlacePhoto>> {
-  const usable = pages.filter((page) => page.pageimage && page.thumbnail);
+  // Vector lead images are maps, flags or seals — not photos of the place.
+  const usable = pages.filter(
+    (page) => page.pageimage && page.thumbnail && !/\.svg$/i.test(page.pageimage),
+  );
   const photos = new Map<string, PlacePhoto>();
   if (usable.length === 0) return photos;
 
