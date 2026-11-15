@@ -23,7 +23,8 @@ export function PublicLayout() {
       >
         {t('nav.skip')}
       </a>
-      <header className="sticky top-0 z-40 border-b border-line/70 bg-bg/85 backdrop-blur-md">
+      {/* Pinned on wide screens only: pinned bars drift on iPhone (iOS 26 Safari). */}
+      <header className="relative z-40 border-b border-line/70 bg-bg lg:sticky lg:top-0 lg:bg-bg/85 lg:backdrop-blur-md">
         <div className="container-page flex h-16 items-center gap-2">
           <Link
             to={paths.home}

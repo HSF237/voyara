@@ -151,117 +151,119 @@ export function SetupPage() {
   );
 
   return (
-    <div className="container-page pt-8 pb-32 sm:pt-12 lg:pb-16">
-      <motion.header initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="font-display text-2xl font-medium tracking-tight text-ink sm:text-3xl">
-          {t('setup.title')}
-        </h1>
-        <p className="mt-2 max-w-xl text-muted">{t('setup.subtitle')}</p>
-      </motion.header>
+    <div>
+      <div className="container-page pt-8 pb-8 sm:pt-12 lg:pb-16">
+        <motion.header initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+          <h1 className="font-display text-2xl font-medium tracking-tight text-ink sm:text-3xl">
+            {t('setup.title')}
+          </h1>
+          <p className="mt-2 max-w-xl text-muted">{t('setup.subtitle')}</p>
+        </motion.header>
 
-      <div className="mt-8 lg:grid lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start lg:gap-10">
-        <motion.div variants={list} initial="hidden" animate="show" className="space-y-4">
-          <Section icon={MapPin} title={t('setup.where')}>
-            <motion.div
-              animate={nudged && !destination ? { x: [0, -8, 8, -5, 5, 0] } : { x: 0 }}
-              transition={{ duration: 0.4 }}
-              onAnimationComplete={() => setNudged(false)}
+        <div className="mt-8 lg:grid lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start lg:gap-10">
+          <motion.div variants={list} initial="hidden" animate="show" className="space-y-4">
+            <Section icon={MapPin} title={t('setup.where')}>
+              <motion.div
+                animate={nudged && !destination ? { x: [0, -8, 8, -5, 5, 0] } : { x: 0 }}
+                transition={{ duration: 0.4 }}
+                onAnimationComplete={() => setNudged(false)}
+              >
+                <DestinationSearch
+                  ref={searchRef}
+                  value={destination}
+                  onSelect={draft.setDestination}
+                />
+              </motion.div>
+            </Section>
+
+            <Section
+              icon={CalendarRange}
+              title={t('setup.when')}
+              aside={`${t('ticket.nights')}: ${nights}`}
             >
-              <DestinationSearch
-                ref={searchRef}
-                value={destination}
-                onSelect={draft.setDestination}
+              <div className="mb-4 flex flex-wrap items-center gap-2">
+                <span className="me-1 text-sm text-muted">{t('setup.dates.length')}</span>
+                {LENGTH_CHOICES.map((length) => (
+                  <Chip
+                    key={length}
+                    selected={days === length}
+                    onSelectedChange={() => setLength(length)}
+                    className="h-9 px-3.5"
+                  >
+                    {length}
+                  </Chip>
+                ))}
+              </div>
+              <DateRangeCalendar
+                startDate={startDate}
+                endDate={endDate}
+                onChange={draft.setDates}
+                minDate={today}
+                maxNights={MAX_NIGHTS}
               />
-            </motion.div>
-          </Section>
+              <DayStrip
+                startDate={startDate}
+                endDate={endDate}
+                forecast={forecast.days}
+                className="mt-5"
+              />
+            </Section>
 
-          <Section
-            icon={CalendarRange}
-            title={t('setup.when')}
-            aside={`${t('ticket.nights')}: ${nights}`}
-          >
-            <div className="mb-4 flex flex-wrap items-center gap-2">
-              <span className="me-1 text-sm text-muted">{t('setup.dates.length')}</span>
-              {LENGTH_CHOICES.map((length) => (
-                <Chip
-                  key={length}
-                  selected={days === length}
-                  onSelectedChange={() => setLength(length)}
-                  className="h-9 px-3.5"
-                >
-                  {length}
-                </Chip>
-              ))}
-            </div>
-            <DateRangeCalendar
-              startDate={startDate}
-              endDate={endDate}
-              onChange={draft.setDates}
-              minDate={today}
-              maxNights={MAX_NIGHTS}
-            />
-            <DayStrip
-              startDate={startDate}
-              endDate={endDate}
-              forecast={forecast.days}
+            <Section icon={UsersRound} title={t('setup.who')}>
+              <CrewPicker value={travellers} onChange={draft.setTravellers} />
+            </Section>
+
+            <Section icon={Wallet} title={t('setup.budget.title')}>
+              <BudgetControl
+                value={budget}
+                onChange={draft.setBudget}
+                scale={scale}
+                currency={homeCurrency}
+                travellers={travellers}
+                days={days}
+                localCurrency={localCurrency}
+                country={destination?.country}
+                rates={rates.data}
+                ratesFailed={rates.isError}
+              />
+            </Section>
+
+            <Section icon={Gauge} title={t('setup.pace.title')}>
+              <PacePicker value={pace} onChange={draft.setPace} label={t('setup.pace.title')} />
+            </Section>
+
+            <Section icon={Heart} title={t('setup.interests')} aside={t('setup.optional')}>
+              <p className="-mt-2 mb-4 text-sm text-muted">{t('setup.interestsHint')}</p>
+              <InterestPicker
+                value={interests}
+                onToggle={draft.toggleInterest}
+                label={t('setup.interests')}
+              />
+            </Section>
+
+            <div className="lg:hidden">{pass}</div>
+          </motion.div>
+
+          <aside className="sticky top-24 hidden lg:block">
+            {pass}
+            <Button
+              size="lg"
+              fullWidth
               className="mt-5"
-            />
-          </Section>
-
-          <Section icon={UsersRound} title={t('setup.who')}>
-            <CrewPicker value={travellers} onChange={draft.setTravellers} />
-          </Section>
-
-          <Section icon={Wallet} title={t('setup.budget.title')}>
-            <BudgetControl
-              value={budget}
-              onChange={draft.setBudget}
-              scale={scale}
-              currency={homeCurrency}
-              travellers={travellers}
-              days={days}
-              localCurrency={localCurrency}
-              country={destination?.country}
-              rates={rates.data}
-              ratesFailed={rates.isError}
-            />
-          </Section>
-
-          <Section icon={Gauge} title={t('setup.pace.title')}>
-            <PacePicker value={pace} onChange={draft.setPace} label={t('setup.pace.title')} />
-          </Section>
-
-          <Section icon={Heart} title={t('setup.interests')} aside={t('setup.optional')}>
-            <p className="-mt-2 mb-4 text-sm text-muted">{t('setup.interestsHint')}</p>
-            <InterestPicker
-              value={interests}
-              onToggle={draft.toggleInterest}
-              label={t('setup.interests')}
-            />
-          </Section>
-
-          <div className="lg:hidden">{pass}</div>
-        </motion.div>
-
-        <aside className="sticky top-24 hidden lg:block">
-          {pass}
-          <Button
-            size="lg"
-            fullWidth
-            className="mt-5"
-            onClick={planIt}
-            iconEnd={<ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" />}
-          >
-            {t('setup.planIt')}
-          </Button>
-          {!destination && (
-            <p className="mt-2 text-center text-sm text-muted">{t('setup.needDestination')}</p>
-          )}
-        </aside>
+              onClick={planIt}
+              iconEnd={<ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" />}
+            >
+              {t('setup.planIt')}
+            </Button>
+            {!destination && (
+              <p className="mt-2 text-center text-sm text-muted">{t('setup.needDestination')}</p>
+            )}
+          </aside>
+        </div>
       </div>
 
-      {/* Phones: the action stays within thumb reach. */}
-      <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 border-t border-line bg-glass px-5 py-3 backdrop-blur-md lg:hidden">
+      {/* Phones: the action stays within thumb reach, at the bottom of the scrolling page. */}
+      <div className="sticky bottom-0 z-30 border-t border-line bg-surface px-5 py-3 shadow-[0_-6px_16px_-10px_rgb(0_0_0/0.25)] lg:hidden">
         <div className="flex items-center gap-4">
           <p className="min-w-0 flex-1 truncate text-sm font-semibold text-ink">
             {destination ? destination.name : t('setup.needDestination')}

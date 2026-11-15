@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion';
 import { LayoutDashboard, LogOut, Luggage, Plus, Settings, type LucideIcon } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, NavLink, Outlet, ScrollRestoration, useLocation } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation, useNavigationType } from 'react-router-dom';
 import { paths } from '@/app/paths';
 import { TopProgress } from '@/app/TopProgress';
 import { useSession } from '@/app/useSession';
@@ -77,12 +77,62 @@ function TabLink({ item }: { item: NavItem }) {
 }
 
 /**
+ * Makes the signed-in area behave like an app rather than a web page: the
+ * document itself never scrolls; the page scrolls inside <main>, and the top
+ * and tab bars are ordinary rows above and below it.
+ *
+ * Why: on iPhone (iOS 26 Safari) bars pinned with `position: fixed` drift to
+ * the middle of the screen when the browser's toolbar collapses or after the
+ * keyboard closes. With nothing pinned and nothing for the browser to collapse,
+ * there is nothing to drift.
+ */
+function useAppShell() {
+  const scroller = useRef<HTMLElement>(null);
+  const location = useLocation();
+  const kind = useNavigationType();
+  const saved = useRef(new Map<string, number>());
+
+  useLayoutEffect(() => {
+    const root = document.documentElement;
+    root.classList.add('vy-app');
+    return () => root.classList.remove('vy-app');
+  }, []);
+
+  // New page: start at the top. Back/forward: return to where the page was left.
+  useLayoutEffect(() => {
+    const node = scroller.current;
+    const positions = saved.current;
+    if (!node) return;
+    node.scrollTop = kind === 'POP' ? (positions.get(location.key) ?? 0) : 0;
+    return () => {
+      positions.set(location.key, node.scrollTop);
+    };
+  }, [location.key, kind]);
+
+  // After the on-screen keyboard closes, iOS can leave the view shifted up.
+  // The document cannot scroll, so sending it "to the top" only undoes that shift.
+  useEffect(() => {
+    const settle = () => requestAnimationFrame(() => window.scrollTo(0, 0));
+    const viewport = window.visualViewport;
+    window.addEventListener('focusout', settle);
+    viewport?.addEventListener('resize', settle);
+    return () => {
+      window.removeEventListener('focusout', settle);
+      viewport?.removeEventListener('resize', settle);
+    };
+  }, []);
+
+  return scroller;
+}
+
+/**
  * The signed-in app: a sidebar on wide screens, a top bar and bottom tab bar
  * on phones. Every page inside renders into <Outlet />.
  */
 export function AppLayout() {
   const { t } = useTranslation();
   const { pathname } = useLocation();
+  const scroller = useAppShell();
   const { user, signOut } = useSession();
   const setUser = useAuth((state) => state.setUser);
 
@@ -101,7 +151,7 @@ export function AppLayout() {
   const [homeItem, tripsItem] = items;
 
   return (
-    <div className="min-h-dvh bg-bg text-ink lg:ps-64">
+    <div className="flex h-full flex-col overflow-hidden bg-bg text-ink lg:ps-64">
       <a
         href="#main"
         className="sr-only z-50 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary focus:not-sr-only focus:fixed focus:start-4 focus:top-4"
@@ -148,7 +198,7 @@ export function AppLayout() {
       </aside>
 
       {/* Phone top bar */}
-      <header className="sticky top-0 z-40 flex h-14 items-center gap-2 border-b border-line/70 bg-bg/85 px-4 backdrop-blur-md lg:hidden">
+      <header className="relative z-40 flex h-14 shrink-0 items-center gap-2 border-b border-line/70 bg-bg px-4 lg:hidden">
         <Link to={paths.dashboard} className="me-auto flex items-center gap-2 rounded-md">
           <LogoMark className="size-7" />
           <span className="font-display text-lg font-medium tracking-tight" translate="no">
@@ -161,7 +211,15 @@ export function AppLayout() {
         </Link>
       </header>
 
-      <main id="main" tabIndex={-1} className="min-w-0 pb-24 outline-none lg:pb-0">
+      {/* The page scrolls here, not in the document: see useAppShell. */}
+      <main
+        id="main"
+        ref={scroller}
+        tabIndex={-1}
+        // "relative" matters: without it, absolutely placed children (even screen-reader-only
+        // labels) would sit outside this scroller and make the document itself scrollable.
+        className="relative min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain outline-none"
+      >
         <motion.div
           key={pathname}
           initial={{ opacity: 0, y: 12 }}
@@ -175,7 +233,7 @@ export function AppLayout() {
       {/* Phone tab bar, with the main action raised in the middle */}
       <nav
         aria-label={t('nav.main')}
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-glass pb-[env(safe-area-inset-bottom)] backdrop-blur-md lg:hidden"
+        className="relative z-40 shrink-0 border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] lg:hidden"
       >
         <div className="mx-auto grid h-16 max-w-md grid-cols-3 items-stretch">
           {homeItem && <TabLink item={homeItem} />}
@@ -192,7 +250,6 @@ export function AppLayout() {
         </div>
       </nav>
       <TopProgress />
-      <ScrollRestoration />
     </div>
   );
 }

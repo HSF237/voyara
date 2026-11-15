@@ -195,6 +195,19 @@
     line-height: 1.6;
   }
 
+  /* The signed-in app shell (app/layout/AppLayout.tsx): the document does not
+     scroll; the page scrolls inside <main>. */
+  html.vy-app,
+  html.vy-app body,
+  html.vy-app #root {
+    height: 100%;
+    overflow: hidden;
+  }
+  html.vy-app body {
+    min-height: 0;
+    overscroll-behavior: none;
+  }
+
   h1,
   h2,
   h3 {
